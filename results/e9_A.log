@@ -1,0 +1,14 @@
+seed 0: 9 platoons, 46s
+seed 1: 18 platoons, 86s
+seed 2: 26 platoons, 115s
+seed 3: 36 platoons, 133s
+seed 4: 45 platoons, 149s
+seed 5: 53 platoons, 158s
+seed 6: 61 platoons, 168s
+seed 7: 67 platoons, 175s
+seed 8: 74 platoons, 182s
+seed 9: 83 platoons, 191s
+c=0.0: 83 platoons, availability 95.19% (min 95.03%, 0 below 95%) | risk 0.34% [0.30,0.40] | dmin1 7.5 m | ms amp max 0.820 (over contract: 0)
+c=0.5: 83 platoons, availability 95.91% (min 95.47%, 0 below 95%) | risk 0.44% [0.38,0.50] | dmin1 7.5 m | ms amp max 0.820 (over contract: 0)
+c=0.9: 83 platoons, availability 97.47% (min 96.47%, 0 below 95%) | risk 0.35% [0.30,0.41] | dmin1 7.5 m | ms amp max 0.820 (over contract: 0)
+done 190.70870518684387

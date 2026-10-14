@@ -1,0 +1,7 @@
+h=0.6: per-state 95 PRB (m=1) | joint-optimal 41 PRB (m=1, gain 1.0102, pbar 0.9441) 119s
+h=0.8: per-state 78 PRB (m=1) | joint-optimal 36 PRB (m=1, gain 1.0110, pbar 0.8999) 234s
+/home/claude/rev/code/channel_trace.py:177: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  prob.solve(solver="CLARABEL")
+h=1.0: per-state 72 PRB (m=1) | joint-optimal 34 PRB (m=1, gain 1.0095, pbar 0.8537) 345s
+h=1.2: per-state 70 PRB (m=1) | joint-optimal 32 PRB (m=1, gain 1.0116, pbar 0.7932) 447s
+done 446.5862672328949

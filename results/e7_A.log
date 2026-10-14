@@ -1,0 +1,14 @@
+seed 0: 9 platoons so far, 77s
+seed 1: 18 platoons so far, 138s
+seed 2: 26 platoons so far, 181s
+seed 3: 36 platoons so far, 207s
+seed 4: 45 platoons so far, 230s
+seed 5: 53 platoons so far, 243s
+seed 6: 61 platoons so far, 257s
+seed 7: 67 platoons so far, 266s
+seed 8: 74 platoons so far, 272s
+seed 9: 83 platoons so far, 283s
+GapSlice      : 83 platoons, PRB 59247, availability simulated 95.16% exact 95.19% (min 95.07%, 0 below 95%) | risk 0.43% [0.38,0.49] | onset available 0.41% (n=47421) | onset in outage 0.84% (n=2379) | dmin1 7.5 m | ms amp max 0.820
+per-link eps  : 83 platoons, PRB 38056, availability simulated 81.77% exact 81.82% (min 73.72%, 83 below 95%) | risk 1.20% [1.11,1.30] | onset available 1.17% (n=40789) | onset in outage 1.36% (n=9011) | dmin1 7.5 m | ms amp max 0.820
+99.99% slice  : 83 platoons, PRB 166384, availability simulated 99.82% exact 99.82% (min 98.58%, 0 below 95%) | risk 0.01% [0.00,0.02] | onset available 0.01% (n=49716) | onset in outage 0.00% (n=84) | dmin1 7.5 m | ms amp max 0.820
+done 283.28246808052063

@@ -1,0 +1,25 @@
+\begin{tabular}{@{}l r r r r@{}}
+\toprule
+Case & $h=0.6$ & $0.8$ & $1.0$ & $1.2$\\
+\midrule
+\multicolumn{5}{@{}l}{\emph{Payload: CEB / $99.99\%$ slice [PRB], $\beta=2$}}\\
+300~B & 30\,/\,92 & 22\,/\,108 & 19\,/\,132 & 18\,/\,152\\
+600~B & 58\,/\,180 & 44\,/\,216 & 38\,/\,260 & 36\,/\,308\\
+1200~B & 114\,/\,356 & 88\,/\,432 & 75\,/\,516 & 71\,/\,612\\
+\multicolumn{5}{@{}l}{\emph{Contract tolerance: CEB [PRB], $\beta=2$ ($h_{\min}$)}}\\
+$1.0025^{2.5}$ (0.6~s) & 132 & 97 & 78 & 74\\
+$1.0025^{5}$ (0.5~s) & 114 & 88 & 75 & 71\\
+$1.0025^{10}$ (0.4~s) & 100 & 77 & 70 & 67\\
+\multicolumn{5}{@{}l}{\emph{Radio model: saving vs.\ $99.99\%$ [\%], $\beta=2$}}\\
+Rician $3$~dB (nominal) & 68 & 80 & 85 & 88\\
+Rayleigh & 74 & 83 & 88 & 92\\
+Rician $10$~dB & 63 & 71 & 75 & 78\\
+Rician $3$~dB, 2-Rx MRC & 67 & 75 & 78 & 81\\
+\multicolumn{5}{@{}l}{\emph{Model error: platoon availability [\%] (detected in $30$~s)}}\\
+No error & 95.1 (5\%) & 95.0 (4\%) & 95.1 (5\%) & 95.1 (4\%)\\
+Rayleigh instead of Rician & 77.2 (87\%) & 82.3 (89\%) & 86.0 (91\%) & 88.6 (88\%)\\
+Large-scale std.\ $+2$~dB & 74.6 (64\%) & 74.3 (68\%) & 74.4 (71\%) & 74.5 (69\%)\\
+Interferers at $200$~m & 68.5 (93\%) & 68.1 (97\%) & 68.2 (99\%) & 68.4 (99\%)\\
+Mean SINR $-3$~dB & 75.2 (84\%) & 74.8 (91\%) & 74.9 (95\%) & 75.1 (96\%)\\
+\bottomrule
+\end{tabular}

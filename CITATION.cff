@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "GapSlice: reference implementation"
+version: 1.0.0
+license: MIT
+authors:
+  - family-names: Qayyum
+    given-names: Tariq
+  - family-names: Lakas
+    given-names: Abderrahmane
+  - family-names: Al Warafy
+    given-names: Abdulmalik
+  - family-names: Brik
+    given-names: Bouziane
+  - family-names: Ferrag
+    given-names: Mohamed Amine
+preferred-citation:
+  type: article
+  title: "GapSlice: Task-Oriented 6G Network Slicing for String-Stable Truck Platooning"
+  journal: "IEEE Open Journal of Vehicular Technology"
+  notes: "Submitted"
+  authors:
+    - family-names: Qayyum
+      given-names: Tariq
+    - family-names: Lakas
+      given-names: Abderrahmane
+    - family-names: Al Warafy
+      given-names: Abdulmalik
+    - family-names: Brik
+      given-names: Bouziane
+    - family-names: Ferrag
+      given-names: Mohamed Amine

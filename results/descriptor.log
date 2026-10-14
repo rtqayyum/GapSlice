@@ -1,0 +1,11 @@
+6/36  127s
+12/36  247s
+18/36  364s
+24/36  478s
+/home/claude/rev/code/fastgain.py:35: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  self.prob.solve(solver="CLARABEL")
+30/36  583s
+/home/claude/rev/code/fastgain.py:35: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  self.prob.solve(solver="CLARABEL")
+36/36  686s
+done 690.440110206604

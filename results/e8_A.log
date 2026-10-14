@@ -1,0 +1,32 @@
+n=10 done 307s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=20 done 750s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=30 done 910s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=40 done 1085s
+GapSlice               n=10:0.989 n=20:0.992 n=30:0.995 n=40:0.998 | n=20 PRB 99% CACC 48%/48% met 1.0 avail 0.9865168399168399 (min 0.962325) | risk 0.52% d1 7.5
+Yan-Harri (original)   n=10:0.463 n=20:0.453 n=30:0.463 n=40:0.478 | n=20 PRB 97% CACC 12%/25% met 0.4726547619047619 avail 0.8764542999999999 (min 0.296175) | risk 0.01% d1 7.4
+Yan-Harri (matched)    n=10:0.657 n=20:0.644 n=30:0.653 n=40:0.608 | n=20 PRB 97% CACC 26%/26% met 1.0 avail 0.9832210861056752 (min 0.9639) | risk 0.29% d1 7.5
+Zhang (original)       n=10:0.565 n=20:0.299 n=30:0.349 n=40:0.376 | n=20 PRB 99% CACC 0%/100% met 0.0005 avail 0.3354301875 (min 5e-05) | risk 1.90% d1 6.6
+Zhang (matched)        n=10:0.924 n=20:0.940 n=30:0.932 n=40:0.925 | n=20 PRB 97% CACC 39%/39% met 1.0 avail 0.9848654269081502 (min 0.967125) | risk 0.14% d1 7.5
+Lu (original)          n=10:0.258 n=20:0.321 n=30:0.374 n=40:0.393 | n=20 PRB 95% CACC 3%/68% met 0.051966117216117214 avail 0.7756082962962964 (min 0.293975) | risk 0.61% d1 7.5
+Lu (matched)           n=10:0.807 n=20:0.850 n=30:0.863 n=40:0.829 | n=20 PRB 88% CACC 43%/43% met 1.0 avail 0.9832756161971832 (min 0.964375) | risk 0.23% d1 7.5
+Oracle                 n=10:1.000 n=20:1.000 n=30:1.000 n=40:1.000 | n=20 PRB 100% CACC 48%/48% met 1.0 avail 0.9861423733195449 (min 0.966625) | risk 1.07% d1 7.5
+0.6 {'infeasible': 64, 'n': 236, 'GapSlice': 1.0, 'Yan-Harri (matched)': 1.79, 'Zhang (matched)': 1.0, 'Lu (matched)': 1.07, '99.99% slice': 3.98}
+1.0 {'infeasible': 0, 'n': 300, 'GapSlice': 1.0, 'Yan-Harri (matched)': 1.88, 'Zhang (matched)': 1.0, 'Lu (matched)': 1.06, '99.99% slice': 7.28}
+1.5 {'infeasible': 0, 'n': 300, 'GapSlice': 1.0, 'Yan-Harri (matched)': 2.01, 'Zhang (matched)': 1.0, 'Lu (matched)': 1.03, '99.99% slice': 13.06}
+done 1086.4902729988098

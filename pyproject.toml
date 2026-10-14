@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gapslice"
+version = "1.0.0"
+description = "GapSlice: task-oriented 6G network slicing for string-stable truck platooning (reference implementation)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Tariq Qayyum" },
+  { name = "Abderrahmane Lakas" },
+  { name = "Abdulmalik Al Warafy" },
+  { name = "Bouziane Brik" },
+  { name = "Mohamed Amine Ferrag" },
+]
+keywords = ["network slicing", "V2X", "truck platooning", "string stability",
+            "Markov jump systems", "control-aware resource allocation", "6G"]
+dependencies = [
+  "numpy>=2.0",
+  "scipy>=1.11",
+  "matplotlib>=3.8",
+  "cvxpy>=1.5",
+  "clarabel>=0.7",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+gapslice = "gapslice.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["gapslice*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

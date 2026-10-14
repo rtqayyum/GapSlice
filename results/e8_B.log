@@ -1,0 +1,41 @@
+n=10 done 102s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=20 done 522s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=30 done 638s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=40 done 771s
+GapSlice               n=10:0.983 n=20:0.989 n=30:0.990 n=40:0.990 | n=20 PRB 95% CACC 47%/47% met 1.0 avail 0.9532953141640041 (min 0.950575) | risk 0.09% d1 7.5
+Yan-Harri (original)   n=10:0.478 n=20:0.437 n=30:0.437 n=40:0.450 | n=20 PRB 97% CACC 14%/30% met 0.45513888888888887 avail 0.8176207286432161 (min 0.220275) | risk 0.01% d1 7.1
+Yan-Harri (matched)    n=10:0.689 n=20:0.680 n=30:0.633 n=40:0.607 | n=20 PRB 97% CACC 30%/30% met 1.0 avail 0.9577567083333334 (min 0.950575) | risk 0.07% d1 7.5
+Zhang (original)       n=10:0.385 n=20:0.329 n=30:0.293 n=40:0.326 | n=20 PRB 99% CACC 4%/100% met 0.041499999999999995 avail 0.2664734125 (min 0.0) | risk 1.81% d1 5.9
+Zhang (matched)        n=10:0.989 n=20:0.994 n=30:0.996 n=40:0.995 | n=20 PRB 97% CACC 45%/45% met 1.0 avail 0.9532568156732891 (min 0.950475) | risk 0.09% d1 7.5
+Lu (original)          n=10:0.325 n=20:0.401 n=30:0.431 n=40:0.444 | n=20 PRB 95% CACC 9%/74% met 0.12227700567406449 avail 0.560476835486064 (min 0.146875) | risk 1.13% d1 7.2
+Lu (matched)           n=10:0.921 n=20:0.902 n=30:0.895 n=40:0.900 | n=20 PRB 90% CACC 47%/47% met 1.0 avail 0.9534464699683878 (min 0.950575) | risk 0.09% d1 7.5
+Oracle                 n=10:1.000 n=20:1.000 n=30:1.000 n=40:1.000 | n=20 PRB 98% CACC 47%/47% met 1.0 avail 0.953198440860215 (min 0.950475) | risk 0.09% d1 7.5
+0.6 {'infeasible': 0, 'n': 300, 'GapSlice': 1.0, 'Yan-Harri (matched)': 2.12, 'Zhang (matched)': 1.0, 'Lu (matched)': 1.0, '99.99% slice': 3.26}
+1.0 {'infeasible': 0, 'n': 300, 'GapSlice': 1.0, 'Yan-Harri (matched)': 2.15, 'Zhang (matched)': 1.0, 'Lu (matched)': 1.0, '99.99% slice': 4.24}
+1.5 {'infeasible': 0, 'n': 300, 'GapSlice': 1.0, 'Yan-Harri (matched)': 2.17, 'Zhang (matched)': 1.0, 'Lu (matched)': 1.0, '99.99% slice': 6.47}
+done 770.9079658985138

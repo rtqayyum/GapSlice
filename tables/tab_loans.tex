@@ -1,0 +1,14 @@
+\begin{tabular}{@{}l r r r r c c c c r r r@{}}
+\toprule
+ & \multicolumn{2}{c}{$t_{95}$ [s]} & \multicolumn{2}{c}{Unserved, $10$~s [\%]} & \multicolumn{2}{c}{Clause exc.: loans} & \multicolumn{2}{c}{Clause exc.: maneuver} & \multicolumn{2}{c}{Per-event risk [\%]} & $d_{1\%}$ [m]\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}\cmidrule(l){12-12}
+Policy & A & B & A & B & A & B & A & B & A & B & B\\
+\midrule
+LTR (Alg.~2) & 6.7 & 55.6 & 22 & 61 & 0/83 & 0/46 & 0/83 & 37/68 & 5.7 {\scriptsize[5.5, 5.9]} & 3.1 {\scriptsize[2.9, 3.2]} & 7.4\\
+Wait for maneuver & 7.1 & 55.6 & 37 & 63 & -- & -- & 0/83 & 37/68 & 5.1 {\scriptsize[4.9, 5.2]} & 2.9 {\scriptsize[2.8, 3.1]} & 7.4\\
+Graduated & 6.5 & 31.8 & 27 & 54 & 0/83 & 37/68 & 0/83 & 37/68 & 5.5 {\scriptsize[5.3, 5.7]} & 7.9 {\scriptsize[7.7, 8.2]} & 7.4\\
+Naive preemption & 0.0 & 0.0 & 0 & 0 & 76/83 & 47/68 & 76/83 & 47/68 & 7.3 {\scriptsize[7.1, 7.5]} & 2.2 {\scriptsize[2.1, 2.4]} & 1.8\\
+Static & 32.1 & 80.6 & 96 & 76 & -- & -- & -- & -- & -- & -- & --\\
+No surge (reference) & -- & -- & -- & -- & -- & -- & -- & -- & 4.0 {\scriptsize[3.8, 4.1]} & 0.5 {\scriptsize[0.4, 0.5]} & 7.3\\
+\bottomrule
+\end{tabular}

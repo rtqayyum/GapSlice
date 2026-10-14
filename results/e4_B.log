@@ -1,0 +1,39 @@
+seed 0: reserved 5794 free 206 CACC 8/20 | f=0.3 lenders 7 steps 7 clock rounds 164 | t95 LTR 55.60 wait 55.60 | 39s
+seed 1: reserved 5335 free 665 CACC 9/20 | f=0.3 lenders 9 steps 17 clock rounds 211 | t95 LTR 55.60 wait 55.60 | 105s
+seed 2: reserved 5962 free 38 CACC 9/20 | f=0.3 lenders 9 steps 15 clock rounds 192 | t95 LTR 55.60 wait 55.60 | 149s
+seed 3: reserved 5914 free 86 CACC 10/20 | f=0.3 lenders 10 steps 18 clock rounds 181 | t95 LTR 55.60 wait 55.60 | 205s
+seed 4: reserved 5314 free 686 CACC 8/20 | f=0.3 lenders 2 steps 2 clock rounds 120 | t95 LTR 55.60 wait 55.60 | 217s
+seed 5: reserved 5124 free 876 CACC 8/20 | f=0.3 lenders 4 steps 4 clock rounds 154 | t95 LTR 55.60 wait 55.60 | 226s
+seed 6: reserved 5827 free 173 CACC 9/20 | f=0.3 lenders 9 steps 18 clock rounds 184 | t95 LTR 55.60 wait 55.60 | 273s
+seed 7: reserved 5533 free 467 CACC 6/20 | f=0.3 lenders 4 steps 4 clock rounds 136 | t95 LTR 55.60 wait 55.60 | 289s
+seed 8: reserved 5495 free 505 CACC 7/20 | f=0.3 lenders 5 steps 5 clock rounds 171 | t95 LTR 55.60 wait 55.60 | 307s
+seed 9: reserved 5800 free 200 CACC 9/20 | f=0.3 lenders 9 steps 17 clock rounds 218 | t95 LTR 55.60 wait 55.60 | 355s
+f=0.2 LTR (Alg. 2)       t50=21.69 t95=55.60 full=55.60 unserved10=47.8% frozen>clause 24/44 >contract 44
+f=0.2 Wait-for-maneuver  t50=21.69 t95=55.60 full=55.60 unserved10=49.3% frozen>clause 24/44 >contract 35
+f=0.2 Graduated          t50=4.64 t95=27.00 full=30.27 unserved10=40.6% frozen>clause 24/44 >contract 44
+f=0.2 Naive preemption   t50=0.00 t95=0.00 full=0.00 unserved10=0.0% frozen>clause 31/44 >contract 44
+f=0.2 Static             t50=39.19 t95=80.60 full=80.60 unserved10=63.9%
+f=0.3 LTR (Alg. 2)       t50=30.58 t95=55.60 full=55.60 unserved10=60.7% frozen>clause 37/68 >contract 68
+f=0.3 Wait-for-maneuver  t50=31.58 t95=55.60 full=55.60 unserved10=62.5% frozen>clause 37/68 >contract 56
+f=0.3 Graduated          t50=6.48 t95=31.82 full=35.73 unserved10=53.7% frozen>clause 37/68 >contract 68
+f=0.3 Naive preemption   t50=0.00 t95=0.00 full=0.00 unserved10=0.0% frozen>clause 47/68 >contract 68
+f=0.3 Static             t50=54.08 t95=80.60 full=80.60 unserved10=75.9%
+f=0.5 LTR (Alg. 2)       t50=50.82 t95=55.60 full=55.60 unserved10=75.9% frozen>clause 50/80 >contract 80
+f=0.5 Wait-for-maneuver  t50=51.04 t95=55.60 full=55.60 unserved10=77.1% frozen>clause 50/80 >contract 70
+f=0.5 Graduated          t50=14.86 t95=36.79 full=39.29 unserved10=70.5% frozen>clause 50/80 >contract 80
+f=0.5 Naive preemption   t50=0.00 t95=0.00 full=0.00 unserved10=0.0% frozen>clause 66/80 >contract 80
+f=0.5 Static             t50=76.04 t95=80.60 full=80.60 unserved10=85.6%
+sim No surge (reference)  : risk 0.47% [0.42,0.54] (n=54400) ms_amp max 0.8207 (>contract 0) e99 max 0.38 dmin1 min 7.3
+sim LTR (Alg. 2)          : risk 3.05% [2.91,3.20] (n=54400) ms_amp max 0.7595 (>contract 0) e99 max 3.99 dmin1 min 7.4
+sim Wait-for-maneuver     : risk 2.92% [2.78,3.06] (n=54400) ms_amp max 0.7595 (>contract 0) e99 max 3.99 dmin1 min 7.4
+sim Graduated             : risk 7.93% [7.70,8.16] (n=54400) ms_amp max 0.7595 (>contract 0) e99 max 3.93 dmin1 min 7.4
+sim Naive preemption      : risk 2.24% [2.12,2.37] (n=54400) ms_amp max 0.7595 (>contract 0) e99 max 5.09 dmin1 min 1.8
+sweep delta=0.01      : t95=55.60 unserved10=62.5% worst metric/clause 100.0000 over contract 56/68
+sweep delta=0.02      : t95=55.60 unserved10=62.1% worst metric/clause 50.0000 over contract 62/68
+sweep delta=0.05      : t95=55.60 unserved10=60.7% worst metric/clause 20.0000 over contract 68/68
+sweep delta=0.1       : t95=55.60 unserved10=58.6% worst metric/clause 10.0000 over contract 68/68
+sweep t_loan=5.0      : t95=55.60 unserved10=60.7% worst metric/clause 20.0000 over contract 68/68
+sweep t_loan=10.0     : t95=55.60 unserved10=60.7% worst metric/clause 20.0000 over contract 68/68
+sweep t_loan=20.0     : t95=55.60 unserved10=60.7% worst metric/clause 20.0000 over contract 68/68
+sweep t_loan=1000000000.0: t95=55.60 unserved10=60.7% worst metric/clause 20.0000 over contract 68/68
+done 354.65600395202637

@@ -1,0 +1,89 @@
+payload done 1.5903289318084717
+tolerance done 3.110687017440796
+radio done 4.64421272277832
+  h=0.6 nominal                 : p_min=0.9172 (p_c=0.9094) gain=1.0000 time share meeting p_c=98.8% det10=0.036 det30=0.052  17s
+  h=0.6 Rayleigh fading         : p_min=0.8454 (p_c=0.9094) gain=1.0000 time share meeting p_c=94.3% det10=0.455 det30=0.874  13s
+  h=0.6 large-scale std +2 dB   : p_min=0.7378 (p_c=0.9094) gain=1.0000 time share meeting p_c=93.6% det10=0.323 det30=0.635  13s
+  h=0.6 interferers at 200 m    : p_min=0.7887 (p_c=0.9094) gain=1.0000 time share meeting p_c=92.1% det10=0.549 det30=0.929  13s
+  h=0.6 mean SINR -3 dB         : p_min=0.8160 (p_c=0.9094) gain=1.0000 time share meeting p_c=93.8% det10=0.426 det30=0.836  26s
+  h=0.8 nominal                 : p_min=0.8460 (p_c=0.8328) gain=1.0000 time share meeting p_c=98.8% det10=0.032 det30=0.038  28s
+  h=0.8 Rayleigh fading         : p_min=0.7501 (p_c=0.8328) gain=1.0000 time share meeting p_c=95.6% det10=0.450 det30=0.888  28s
+  h=0.8 large-scale std +2 dB   : p_min=0.5340 (p_c=0.8328) gain=1.0000 time share meeting p_c=93.6% det10=0.352 det30=0.680  28s
+  h=0.8 interferers at 200 m    : p_min=0.6157 (p_c=0.8328) gain=1.0000 time share meeting p_c=92.0% det10=0.642 det30=0.970  24s
+  h=0.8 mean SINR -3 dB         : p_min=0.6620 (p_c=0.8328) gain=1.0000 time share meeting p_c=93.7% det10=0.507 det30=0.912  13s
+  h=1.0 nominal                 : p_min=0.7696 (p_c=0.7495) gain=1.0000 time share meeting p_c=98.8% det10=0.035 det30=0.051  13s
+  h=1.0 Rayleigh fading         : p_min=0.6654 (p_c=0.7495) gain=1.0000 time share meeting p_c=96.5% det10=0.475 det30=0.912  12s
+  h=1.0 large-scale std +2 dB   : p_min=0.3631 (p_c=0.7495) gain=1.0000 time share meeting p_c=93.6% det10=0.388 det30=0.714  14s
+  h=1.0 interferers at 200 m    : p_min=0.4580 (p_c=0.7495) gain=1.0000 time share meeting p_c=92.0% det10=0.724 det30=0.989  13s
+  h=1.0 mean SINR -3 dB         : p_min=0.5157 (p_c=0.7495) gain=1.0000 time share meeting p_c=93.7% det10=0.592 det30=0.953  12s
+  h=1.2 nominal                 : p_min=0.6947 (p_c=0.6677) gain=1.0000 time share meeting p_c=98.8% det10=0.054 det30=0.042  12s
+  h=1.2 Rayleigh fading         : p_min=0.5929 (p_c=0.6677) gain=1.0000 time share meeting p_c=97.2% det10=0.537 det30=0.877  12s
+  h=1.2 large-scale std +2 dB   : p_min=0.2397 (p_c=0.6677) gain=1.0000 time share meeting p_c=93.6% det10=0.432 det30=0.694  13s
+  h=1.2 interferers at 200 m    : p_min=0.3326 (p_c=0.6677) gain=1.0000 time share meeting p_c=92.1% det10=0.815 det30=0.991  12s
+  h=1.2 mean SINR -3 dB         : p_min=0.3934 (p_c=0.6677) gain=1.0000 time share meeting p_c=93.8% det10=0.698 det30=0.957  12s
+L=300B beta=0.0 h=0.6: CEB=24.0 class=45.0 99.99%=92.0
+L=300B beta=0.0 h=0.8: CEB=20.0 class=27.0 99.99%=108.0
+L=300B beta=0.0 h=1.0: CEB=18.0 class=32.0 99.99%=132.0
+L=300B beta=0.0 h=1.2: CEB=18.0 class=36.0 99.99%=152.0
+L=300B beta=2.0 h=0.6: CEB=30.0 class=45.0 99.99%=92.0
+L=300B beta=2.0 h=0.8: CEB=22.0 class=27.0 99.99%=108.0
+L=300B beta=2.0 h=1.0: CEB=19.0 class=32.0 99.99%=132.0
+L=300B beta=2.0 h=1.2: CEB=18.0 class=36.0 99.99%=152.0
+L=600B beta=0.0 h=0.6: CEB=48.0 class=87.0 99.99%=180.0
+L=600B beta=0.0 h=0.8: CEB=39.0 class=54.0 99.99%=216.0
+L=600B beta=0.0 h=1.0: CEB=36.0 class=64.0 99.99%=260.0
+L=600B beta=0.0 h=1.2: CEB=35.0 class=72.0 99.99%=308.0
+L=600B beta=2.0 h=0.6: CEB=58.0 class=87.0 99.99%=180.0
+L=600B beta=2.0 h=0.8: CEB=44.0 class=54.0 99.99%=216.0
+L=600B beta=2.0 h=1.0: CEB=38.0 class=64.0 99.99%=260.0
+L=600B beta=2.0 h=1.2: CEB=36.0 class=72.0 99.99%=308.0
+L=1200B beta=0.0 h=0.6: CEB=95.0 class=171.0 99.99%=356.0
+L=1200B beta=0.0 h=0.8: CEB=78.0 class=108.0 99.99%=432.0
+L=1200B beta=0.0 h=1.0: CEB=72.0 class=126.0 99.99%=516.0
+L=1200B beta=0.0 h=1.2: CEB=70.0 class=144.0 99.99%=612.0
+L=1200B beta=2.0 h=0.6: CEB=114.0 class=171.0 99.99%=356.0
+L=1200B beta=2.0 h=0.8: CEB=88.0 class=108.0 99.99%=432.0
+L=1200B beta=2.0 h=1.0: CEB=75.0 class=126.0 99.99%=516.0
+L=1200B beta=2.0 h=1.2: CEB=71.0 class=144.0 99.99%=612.0
+tol 1.0025^2.5 beta=0.0: h_min=0.3 at 1.0 s CEB=75.0 vs 516.0
+tol 1.0025^2.5 beta=2.0: h_min=0.6 at 1.0 s CEB=78.0 vs 516.0
+tol 1.0025^2.5 beta=4.0: h_min=0.9 at 1.0 s CEB=136.0 vs 516.0
+tol 1.0025^5.0 beta=0.0: h_min=0.3 at 1.0 s CEB=72.0 vs 516.0
+tol 1.0025^5.0 beta=2.0: h_min=0.5 at 1.0 s CEB=75.0 vs 516.0
+tol 1.0025^5.0 beta=4.0: h_min=0.8 at 1.0 s CEB=112.0 vs 516.0
+tol 1.0025^10.0 beta=0.0: h_min=0.3 at 1.0 s CEB=69.0 vs 516.0
+tol 1.0025^10.0 beta=2.0: h_min=0.4 at 1.0 s CEB=70.0 vs 516.0
+tol 1.0025^10.0 beta=4.0: h_min=0.7 at 1.0 s CEB=84.0 vs 516.0
+Rician K=3 dB (nominal)  beta=0.0 h=0.6: CEB=95.0 99.99%=356.0
+Rician K=3 dB (nominal)  beta=0.0 h=0.8: CEB=78.0 99.99%=432.0
+Rician K=3 dB (nominal)  beta=0.0 h=1.0: CEB=72.0 99.99%=516.0
+Rician K=3 dB (nominal)  beta=0.0 h=1.2: CEB=70.0 99.99%=612.0
+Rician K=3 dB (nominal)  beta=2.0 h=0.6: CEB=114.0 99.99%=356.0
+Rician K=3 dB (nominal)  beta=2.0 h=0.8: CEB=88.0 99.99%=432.0
+Rician K=3 dB (nominal)  beta=2.0 h=1.0: CEB=75.0 99.99%=516.0
+Rician K=3 dB (nominal)  beta=2.0 h=1.2: CEB=71.0 99.99%=612.0
+Rayleigh                 beta=0.0 h=0.6: CEB=120.0 99.99%=576.0
+Rayleigh                 beta=0.0 h=0.8: CEB=112.0 99.99%=716.0
+Rayleigh                 beta=0.0 h=1.0: CEB=97.0 99.99%=872.0
+Rayleigh                 beta=0.0 h=1.2: CEB=88.0 99.99%=1048.0
+Rayleigh                 beta=2.0 h=0.6: CEB=152.0 99.99%=576.0
+Rayleigh                 beta=2.0 h=0.8: CEB=120.0 99.99%=716.0
+Rayleigh                 beta=2.0 h=1.0: CEB=102.0 99.99%=872.0
+Rayleigh                 beta=2.0 h=1.2: CEB=89.0 99.99%=1048.0
+Rician K=10 dB           beta=0.0 h=0.6: CEB=50.0 99.99%=156.0
+Rician K=10 dB           beta=0.0 h=0.8: CEB=52.0 99.99%=186.0
+Rician K=10 dB           beta=0.0 h=1.0: CEB=54.0 99.99%=222.0
+Rician K=10 dB           beta=0.0 h=1.2: CEB=57.0 99.99%=260.0
+Rician K=10 dB           beta=2.0 h=0.6: CEB=57.0 99.99%=156.0
+Rician K=10 dB           beta=2.0 h=0.8: CEB=54.0 99.99%=186.0
+Rician K=10 dB           beta=2.0 h=1.0: CEB=55.0 99.99%=222.0
+Rician K=10 dB           beta=2.0 h=1.2: CEB=57.0 99.99%=260.0
+K=3 dB, 2-Rx MRC         beta=0.0 h=0.6: CEB=40.0 99.99%=138.0
+K=3 dB, 2-Rx MRC         beta=0.0 h=0.8: CEB=39.0 99.99%=162.0
+K=3 dB, 2-Rx MRC         beta=0.0 h=1.0: CEB=40.0 99.99%=186.0
+K=3 dB, 2-Rx MRC         beta=0.0 h=1.2: CEB=41.0 99.99%=213.0
+K=3 dB, 2-Rx MRC         beta=2.0 h=0.6: CEB=46.0 99.99%=138.0
+K=3 dB, 2-Rx MRC         beta=2.0 h=0.8: CEB=41.0 99.99%=162.0
+K=3 dB, 2-Rx MRC         beta=2.0 h=1.0: CEB=40.0 99.99%=186.0
+K=3 dB, 2-Rx MRC         beta=2.0 h=1.2: CEB=41.0 99.99%=213.0
+done 333.3031747341156

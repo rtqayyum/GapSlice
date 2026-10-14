@@ -1,0 +1,100 @@
+n=4 done 32s
+n=8 done 35s
+n=12 done 38s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=16 done 42s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=20 done 46s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=24 done 51s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=32 done 58s
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+HighsMipSolverData::transformNewIntegerFeasibleSolution tmpSolver.run();
+n=40 done 68s
+Oracle
+  n= 4 U/U*=1.0000 [1.0000,1.0000] min 1.000 CACC=79% gap=0.84s used=76% feas=True load(99.99%)=2.55
+  n= 8 U/U*=1.0000 [1.0000,1.0000] min 1.000 CACC=69% gap=1.09s used=92% feas=True load(99.99%)=4.92
+  n=12 U/U*=1.0000 [1.0000,1.0000] min 1.000 CACC=60% gap=1.31s used=96% feas=True load(99.99%)=7.18
+  n=16 U/U*=1.0000 [1.0000,1.0000] min 1.000 CACC=49% gap=1.57s used=97% feas=True load(99.99%)=10.27
+  n=20 U/U*=1.0000 [1.0000,1.0000] min 1.000 CACC=46% gap=1.66s used=99% feas=True load(99.99%)=12.45
+  n=24 U/U*=1.0000 [1.0000,1.0000] min 1.000 CACC=41% gap=1.77s used=99% feas=True load(99.99%)=14.85
+  n=32 U/U*=1.0000 [1.0000,1.0000] min 1.000 CACC=34% gap=1.95s used=99% feas=True load(99.99%)=20.41
+  n=40 U/U*=1.0000 [1.0000,1.0000] min 1.000 CACC=29% gap=2.09s used=100% feas=True load(99.99%)=25.30
+Market (CEB)
+  n= 4 U/U*=0.9824 [0.9737,0.9912] min 0.821 CACC=81% gap=0.81s used=73% feas=True rounds=75 (max 107)
+  n= 8 U/U*=0.9788 [0.9706,0.9870] min 0.813 CACC=71% gap=1.06s used=87% feas=True rounds=103 (max 108)
+  n=12 U/U*=0.9800 [0.9734,0.9866] min 0.856 CACC=61% gap=1.30s used=91% feas=True rounds=107 (max 108)
+  n=16 U/U*=0.9823 [0.9775,0.9870] min 0.897 CACC=50% gap=1.56s used=92% feas=True rounds=107 (max 108)
+  n=20 U/U*=0.9872 [0.9838,0.9906] min 0.916 CACC=46% gap=1.65s used=95% feas=True rounds=108 (max 108)
+  n=24 U/U*=0.9899 [0.9874,0.9923] min 0.951 CACC=41% gap=1.77s used=96% feas=True rounds=108 (max 109)
+  n=32 U/U*=0.9919 [0.9900,0.9937] min 0.968 CACC=35% gap=1.93s used=97% feas=True rounds=108 (max 109)
+  n=40 U/U*=0.9925 [0.9908,0.9941] min 0.966 CACC=29% gap=2.07s used=98% feas=True rounds=108 (max 109)
+Market (classes)
+  n= 4 U/U*=0.9231 [0.9044,0.9418] min 0.646 CACC=74% gap=0.95s used=74% feas=True
+  n= 8 U/U*=0.9100 [0.8957,0.9244] min 0.624 CACC=64% gap=1.20s used=83% feas=True
+  n=12 U/U*=0.9166 [0.9072,0.9261] min 0.781 CACC=56% gap=1.41s used=91% feas=True
+  n=16 U/U*=0.9236 [0.9166,0.9307] min 0.815 CACC=47% gap=1.63s used=94% feas=True
+  n=20 U/U*=0.9195 [0.9145,0.9245] min 0.857 CACC=42% gap=1.75s used=97% feas=True
+  n=24 U/U*=0.9240 [0.9190,0.9290] min 0.866 CACC=38% gap=1.87s used=98% feas=True
+  n=32 U/U*=0.9214 [0.9183,0.9245] min 0.878 CACC=32% gap=2.01s used=99% feas=True
+  n=40 U/U*=0.9276 [0.9249,0.9303] min 0.899 CACC=27% gap=2.13s used=99% feas=True
+CEB-fixed
+  n= 4 U/U*=0.9750 [0.9632,0.9868] min 0.698 CACC=78% gap=0.84s used=67% feas=True
+  n= 8 U/U*=0.9714 [0.9617,0.9811] min 0.778 CACC=68% gap=1.10s used=82% feas=True
+  n=12 U/U*=0.9737 [0.9659,0.9814] min 0.825 CACC=59% gap=1.32s used=88% feas=True
+  n=16 U/U*=0.9744 [0.9692,0.9796] min 0.899 CACC=49% gap=1.57s used=89% feas=True
+  n=20 U/U*=0.9784 [0.9738,0.9830] min 0.908 CACC=45% gap=1.67s used=92% feas=True
+  n=24 U/U*=0.9853 [0.9820,0.9886] min 0.935 CACC=41% gap=1.78s used=94% feas=True
+  n=32 U/U*=0.9862 [0.9832,0.9892] min 0.916 CACC=34% gap=1.94s used=96% feas=True
+  n=40 U/U*=0.9883 [0.9862,0.9903] min 0.955 CACC=29% gap=2.08s used=97% feas=True
+99.99%-fixed
+  n= 4 U/U*=0.7307 [0.6946,0.7667] min 0.389 CACC=57% gap=1.38s used=66% feas=True
+  n= 8 U/U*=0.7147 [0.6928,0.7367] min 0.419 CACC=51% gap=1.53s used=72% feas=True
+  n=12 U/U*=0.7245 [0.7078,0.7412] min 0.536 CACC=43% gap=1.73s used=82% feas=True
+  n=16 U/U*=0.7341 [0.7208,0.7474] min 0.538 CACC=36% gap=1.91s used=86% feas=True
+  n=20 U/U*=0.7455 [0.7338,0.7571] min 0.604 CACC=32% gap=1.99s used=91% feas=True
+  n=24 U/U*=0.7405 [0.7288,0.7522] min 0.590 CACC=28% gap=2.09s used=93% feas=True
+  n=32 U/U*=0.7395 [0.7300,0.7490] min 0.610 CACC=22% gap=2.24s used=96% feas=True
+  n=40 U/U*=0.7365 [0.7272,0.7458] min 0.638 CACC=19% gap=2.33s used=97% feas=True
+Equal share
+  n= 4 U/U*=0.6941 [0.6531,0.7352] min 0.211 CACC=61% gap=1.37s used=33% feas=True
+  n= 8 U/U*=0.5470 [0.5169,0.5772] min 0.213 CACC=43% gap=1.80s used=25% feas=True
+  n=12 U/U*=0.4426 [0.4206,0.4645] min 0.237 CACC=33% gap=2.13s used=23% feas=True
+  n=16 U/U*=0.4755 [0.4529,0.4982] min 0.239 CACC=21% gap=2.27s used=18% feas=True
+  n=20 U/U*=0.3576 [0.3446,0.3706] min 0.224 CACC=9% gap=2.57s used=8% feas=True
+  n=24 U/U*=0.3658 [0.3542,0.3775] min 0.235 CACC=9% gap=2.59s used=8% feas=True
+  n=32 U/U*=0.3623 [0.3550,0.3695] min 0.289 CACC=7% gap=2.64s used=7% feas=True
+  n=40 U/U*=0.3519 [0.3456,0.3581] min 0.280 CACC=3% gap=2.74s used=3% feas=True
+done 68.35989093780518

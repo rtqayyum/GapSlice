@@ -1,0 +1,20 @@
+\begin{tabular}{@{}l l r r r r r r r r r r r l@{}}
+\toprule
+ & & \multicolumn{2}{c}{PRBs/link [$\times$]} & \multicolumn{2}{c}{Target met [\%]} & \multicolumn{2}{c}{Availability [\%]} & \multicolumn{2}{c}{Event risk [\%]} & \multicolumn{2}{c}{Utility [\%]} & Surge $t_{95}$ & \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-10}\cmidrule(lr){11-12}
+Method & Mode & A & B & A & B & A & B & A & B & A & B & A / B [s] & Information required\\
+\midrule
+GapSlice & -- & 1.00 & 1.00 & 100 & 100 & 98.7 & 95.3 & 0.52 & 0.09 & 99.2 & 98.9 & 6.7 / 55.6 & descriptor tables, menu choices\\
+\addlinespace[2pt]
+Yan--H\"arri~\cite{Yan2024ICC} & original & -- & -- & 47 & 46 & 87.6 & 81.8 & 0.01 & 0.01 & 45.3 & 43.7 & n/a & platoon size, join requests\\
+ & matched & 1.88 & 2.15 & 100 & 100 & 98.3 & 95.8 & 0.29 & 0.07 & 64.4 & 68.0 &  & \\
+\addlinespace[2pt]
+Zhang \emph{et al.}~\cite{Zhang2023TIV} & original & -- & -- & 0 & 4 & 33.5 & 26.6 & 1.90 & 1.81 & 29.9 & 32.9 & n/a & controller model, vehicle states\\
+ & matched & 1.00 & 1.00 & 100 & 100 & 98.5 & 95.3 & 0.14 & 0.09 & 94.0 & 99.4 &  & \\
+\addlinespace[2pt]
+Lu \emph{et al.}~\cite{Lu2024TNSM} & original & -- & -- & 5 & 12 & 77.6 & 56.0 & 0.61 & 1.13 & 32.1 & 40.1 & n/a & slice SLA, agent observations\\
+ & matched & 1.06 & 1.00 & 100 & 100 & 98.3 & 95.3 & 0.23 & 0.09 & 85.0 & 90.2 &  & \\
+\addlinespace[2pt]
+Optimum of P1 & -- & 1.00 & 1.00 & 100 & 100 & 98.6 & 95.3 & 1.07 & 0.09 & 100.0 & 100.0 & n/a & full information\\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,27 @@
+LOS dc=10.0 h=0.6: slice: 356 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 35 PRB g=1.0313 risk=0.27% (pbar=0.9200, beta=1.19) | per_state: 95 PRB g=1.0000 risk=0.00% (pbar=0.9872, beta=1.02)  40s
+LOS dc=10.0 h=0.8: slice: 432 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 30 PRB g=1.0618 risk=2.43% (pbar=0.8456, beta=1.41) | per_state: 78 PRB g=1.0000 risk=0.00% (pbar=0.9771, beta=1.05)  78s
+LOS dc=10.0 h=1.0: slice: 516 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 28 PRB g=1.0748 risk=8.43% (pbar=0.7706, beta=1.66) | per_state: 72 PRB g=1.0000 risk=0.00% (pbar=0.9664, beta=1.07)  116s
+LOS dc=10.0 h=1.2: slice: 612 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 26 PRB g=1.0791 risk=15.27% (pbar=0.6742, beta=2.03) | per_state: 70 PRB g=1.0000 risk=0.00% (pbar=0.9557, beta=1.10)  157s
+LOS dc=25.0 h=0.6: slice: 356 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 35 PRB g=1.0578 risk=0.70% (pbar=0.9196, beta=1.20) | per_state: 95 PRB g=1.0000 risk=0.00% (pbar=0.9871, beta=1.03)  225s
+LOS dc=25.0 h=0.8: slice: 432 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 30 PRB g=1.1203 risk=4.67% (pbar=0.8450, beta=1.44) | per_state: 78 PRB g=1.0000 risk=0.00% (pbar=0.9770, beta=1.05)  303s
+LOS dc=25.0 h=1.0: slice: 516 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 28 PRB g=1.1375 risk=11.70% (pbar=0.7698, beta=1.70) | per_state: 72 PRB g=1.0000 risk=0.00% (pbar=0.9663, beta=1.07)  341s
+LOS dc=25.0 h=1.2: slice: 612 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 26 PRB g=1.1291 risk=19.50% (pbar=0.6734, beta=2.09) | per_state: 70 PRB g=1.0000 risk=0.00% (pbar=0.9555, beta=1.10)  380s
+LOS dc=50.0 h=0.6: slice: 356 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 35 PRB g=1.0858 risk=0.90% (pbar=0.9194, beta=1.21) | per_state: 95 PRB g=1.0000 risk=0.00% (pbar=0.9871, beta=1.03)  417s
+LOS dc=50.0 h=0.8: slice: 432 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 30 PRB g=1.1738 risk=5.30% (pbar=0.8446, beta=1.45) | per_state: 78 PRB g=1.0000 risk=0.00% (pbar=0.9770, beta=1.05)  452s
+LOS dc=50.0 h=1.0: slice: 516 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 28 PRB g=1.1855 risk=12.37% (pbar=0.7694, beta=1.72) | per_state: 72 PRB g=1.0000 risk=0.00% (pbar=0.9662, beta=1.08)  487s
+LOS dc=50.0 h=1.2: slice: 612 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 27 PRB g=1.1545 risk=18.40% (pbar=0.6986, beta=2.00) | per_state: 70 PRB g=1.0000 risk=0.00% (pbar=0.9553, beta=1.10)  521s
+NLOSv dc=13.0 h=0.6: slice: 5468 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 185 PRB g=1.0705 risk=2.80% (pbar=0.9209, beta=1.33) | per_state: 1086 PRB g=1.0000 risk=0.00% (pbar=0.9983, beta=1.02)  560s
+NLOSv dc=13.0 h=0.8: slice: 7064 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 134 PRB g=1.1074 risk=9.97% (pbar=0.8504, beta=1.67) | per_state: 1062 PRB g=1.0000 risk=0.00% (pbar=0.9967, beta=1.04)  598s
+/home/claude/rev/code/channel_trace.py:177: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  prob.solve(solver="CLARABEL")
+NLOSv dc=13.0 h=1.0: slice: 8868 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 107 PRB g=1.1059 risk=18.23% (pbar=0.7688, beta=2.05) | per_state: 1018 PRB g=1.0000 risk=0.00% (pbar=0.9820, beta=1.06)  636s
+NLOSv dc=13.0 h=1.2: slice: 10880 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 89 PRB g=1.0918 risk=22.57% (pbar=0.6796, beta=2.50) | per_state: 974 PRB g=1.0000 risk=0.00% (pbar=0.9762, beta=1.08)  673s
+NLOSv dc=25.0 h=0.6: slice: 5468 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 187 PRB g=1.1140 risk=3.23% (pbar=0.9215, beta=1.35) | per_state: 1086 PRB g=1.0000 risk=0.00% (pbar=0.9983, beta=1.02)  711s
+NLOSv dc=25.0 h=0.8: slice: 7064 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 136 PRB g=1.1608 risk=11.77% (pbar=0.8522, beta=1.70) | per_state: 1062 PRB g=1.0000 risk=0.00% (pbar=0.9967, beta=1.04)  750s
+NLOSv dc=25.0 h=1.0: slice: 8868 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 108 PRB g=1.1470 risk=19.87% (pbar=0.7703, beta=2.11) | per_state: 1018 PRB g=1.0000 risk=0.00% (pbar=0.9819, beta=1.07)  786s
+NLOSv dc=25.0 h=1.2: slice: 10880 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 89 PRB g=1.1254 risk=25.37% (pbar=0.6790, beta=2.58) | per_state: 974 PRB g=1.0000 risk=0.00% (pbar=0.9761, beta=1.09)  823s
+NLOSv dc=50.0 h=0.6: slice: 5468 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 189 PRB g=1.1719 risk=4.20% (pbar=0.9221, beta=1.36) | per_state: 1086 PRB g=1.0000 risk=0.00% (pbar=0.9982, beta=1.02)  860s
+NLOSv dc=50.0 h=0.8: slice: 7064 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 137 PRB g=1.2187 risk=11.40% (pbar=0.8530, beta=1.72) | per_state: 1062 PRB g=1.0000 risk=0.00% (pbar=0.9966, beta=1.05)  895s
+NLOSv dc=50.0 h=1.0: slice: 8868 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 109 PRB g=1.1858 risk=19.07% (pbar=0.7720, beta=2.13) | per_state: 1018 PRB g=1.0000 risk=0.00% (pbar=0.9818, beta=1.07)  932s
+NLOSv dc=50.0 h=1.2: slice: 10880 PRB g=1.0000 risk=0.00% (pbar=1.0000, beta=1.00) | time_avg: 90 PRB g=1.1553 risk=26.27% (pbar=0.6819, beta=2.62) | per_state: 974 PRB g=1.0000 risk=0.00% (pbar=0.9760, beta=1.09)  968s
+done 968.9783525466919

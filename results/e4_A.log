@@ -1,0 +1,40 @@
+seed 0: reserved 5955 free 45 CACC 9/20 | f=0.3 lenders 9 steps 27 clock rounds 146 | t95 LTR 4.45 wait 4.45 | 87s
+seed 1: reserved 5970 free 30 CACC 9/20 | f=0.3 lenders 9 steps 36 clock rounds 162 | t95 LTR 8.90 wait 8.90 | 162s
+seed 2: reserved 5596 free 404 CACC 8/20 | f=0.3 lenders 8 steps 11 clock rounds 123 | t95 LTR 2.25 wait 2.25 | 215s
+seed 3: reserved 5929 free 71 CACC 10/20 | f=0.3 lenders 10 steps 40 clock rounds 162 | t95 LTR 6.70 wait 6.70 | 258s
+seed 4: reserved 5986 free 14 CACC 9/20 | f=0.3 lenders 9 steps 35 clock rounds 150 | t95 LTR 6.70 wait 8.90 | 296s
+seed 5: reserved 5984 free 16 CACC 8/20 | f=0.3 lenders 8 steps 32 clock rounds 164 | t95 LTR 8.90 wait 8.90 | 321s
+seed 6: reserved 5990 free 10 CACC 8/20 | f=0.3 lenders 8 steps 32 clock rounds 165 | t95 LTR 6.70 wait 6.70 | 345s
+seed 7: reserved 5872 free 128 CACC 6/20 | f=0.3 lenders 6 steps 29 clock rounds 173 | t95 LTR 8.90 wait 8.90 | 365s
+seed 8: reserved 5971 free 29 CACC 7/20 | f=0.3 lenders 7 steps 19 clock rounds 149 | t95 LTR 4.45 wait 6.70 | 378s
+seed 9: reserved 5994 free 6 CACC 9/20 | f=0.3 lenders 9 steps 36 clock rounds 170 | t95 LTR 8.90 wait 8.90 | 400s
+f=0.2 LTR (Alg. 2)       t50=0.23 t95=3.13 full=3.35 unserved10=8.1% frozen>clause 0/81 >contract 81
+f=0.2 Wait-for-maneuver  t50=2.25 t95=4.01 full=4.01 unserved10=25.5% frozen>clause 0/81 >contract 0
+f=0.2 Graduated          t50=1.42 t95=3.33 full=3.76 unserved10=15.2% frozen>clause 0/81 >contract 46
+f=0.2 Naive preemption   t50=0.00 t95=0.00 full=0.00 unserved10=0.0% frozen>clause 43/81 >contract 81
+f=0.2 Static             t50=27.25 t95=29.01 full=29.01 unserved10=93.4%
+f=0.3 LTR (Alg. 2)       t50=1.35 t95=6.69 full=7.80 unserved10=21.7% frozen>clause 0/83 >contract 83
+f=0.3 Wait-for-maneuver  t50=3.35 t95=7.13 full=8.24 unserved10=37.0% frozen>clause 0/83 >contract 1
+f=0.3 Graduated          t50=2.20 t95=6.46 full=7.28 unserved10=26.7% frozen>clause 0/83 >contract 78
+f=0.3 Naive preemption   t50=0.00 t95=0.00 full=0.00 unserved10=0.0% frozen>clause 76/83 >contract 83
+f=0.3 Static             t50=28.35 t95=32.13 full=33.24 unserved10=95.6%
+f=0.5 LTR (Alg. 2)       t50=4.91 t95=43.35 full=43.58 unserved10=49.8% frozen>clause 28/83 >contract 83
+f=0.5 Wait-for-maneuver  t50=5.81 t95=43.35 full=43.58 unserved10=59.8% frozen>clause 28/83 >contract 62
+f=0.5 Graduated          t50=4.95 t95=29.15 full=35.20 unserved10=52.7% frozen>clause 28/83 >contract 83
+f=0.5 Naive preemption   t50=0.00 t95=0.00 full=0.00 unserved10=0.0% frozen>clause 83/83 >contract 83
+f=0.5 Static             t50=30.80 t95=68.35 full=68.58 unserved10=97.4%
+sim No surge (reference)  : risk 3.96% [3.82,4.11] (n=66400) ms_amp max 0.8205 (>contract 0) e99 max 1.59 dmin1 min 7.4
+sim LTR (Alg. 2)          : risk 5.70% [5.53,5.88] (n=66400) ms_amp max 0.7236 (>contract 0) e99 max 1.96 dmin1 min 7.5
+sim Wait-for-maneuver     : risk 5.07% [4.90,5.24] (n=66400) ms_amp max 0.7235 (>contract 0) e99 max 1.86 dmin1 min 7.5
+sim Graduated             : risk 5.51% [5.34,5.68] (n=66400) ms_amp max 0.7236 (>contract 0) e99 max 1.92 dmin1 min 7.5
+sim Naive preemption      : risk 7.29% [7.10,7.49] (n=66400) ms_amp max 0.7237 (>contract 0) e99 max 1.98 dmin1 min 7.5
+sweep gamma_exp=5.0   : t95=7.13 unserved10=37.0% worst metric/clause 1.0006 over contract 1/83
+sweep gamma_exp=7.5   : t95=7.13 unserved10=32.5% worst metric/clause 0.9938 over contract 74/83
+sweep gamma_exp=10.0  : t95=6.69 unserved10=21.7% worst metric/clause 0.9933 over contract 83/83
+sweep gamma_exp=15.0  : t95=4.91 unserved10=15.7% worst metric/clause 0.9722 over contract 83/83
+sweep gamma_exp=20.0  : t95=4.91 unserved10=15.7% worst metric/clause 0.9482 over contract 83/83
+sweep t_loan=5.0      : t95=7.13 unserved10=23.7% worst metric/clause 0.9933 over contract 83/83
+sweep t_loan=10.0     : t95=6.69 unserved10=21.7% worst metric/clause 0.9933 over contract 83/83
+sweep t_loan=20.0     : t95=6.69 unserved10=21.7% worst metric/clause 0.9933 over contract 83/83
+sweep t_loan=1000000000.0: t95=6.69 unserved10=21.7% worst metric/clause 0.9933 over contract 83/83
+done 399.8152265548706
