@@ -26,6 +26,9 @@ plt.rcParams.update({
     "lines.markersize": 4, "legend.frameon": False, "savefig.dpi": 300,
     "figure.dpi": 150, "axes.spines.top": False, "axes.spines.right": False,
     "pdf.fonttype": 42,
+    # pinned: the stored figures were drawn without font hinting, and the
+    # matplotlib default differs between installations
+    "text.hinting": "no_hinting",
 })
 W1, W2 = 3.5, 7.16   # IEEE column / page width [in]
 BN = {0.0: "i.i.d.", 2.0: r"$\beta$ = 2", 4.0: r"$\beta$ = 4"}

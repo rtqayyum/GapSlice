@@ -8,8 +8,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: Install dependencies
@@ -19,4 +19,9 @@ jobs:
       - name: Run checks
         env:
           OMP_NUM_THREADS: "1"
-        run: python -m pytest -q
+        run: |
+          set -o pipefail
+          python -m pytest -q -rf --tb=short | tee pytest.log
+      - name: Report failing checks
+        if: failure()
+        run: grep -E "^(FAILED|ERROR) " pytest.log | sed 's/^/::error::/' || true
