@@ -18,10 +18,19 @@ mkdir -p "$JOB_REPORT"
 PHASE=setup
 record_exit() {
   local code=$?
+  trap - EXIT
+  if declare -F gs_release_project_lock >/dev/null; then
+    if gs_release_project_lock; then
+      :
+    else
+      if [ "$code" -eq 0 ]; then code=74; fi
+    fi
+  fi
   printf '{"job_id":"%s","exit_code":%s,"phase":"%s"}\n' \
     "${SLURM_JOB_ID:-local}" "$code" "$PHASE" > "$JOB_REPORT/status.json"
   printf 'Job %s exited with code %s during phase %s. Campaign outputs, if started, are under outputs/ojcs/.\n' \
     "${SLURM_JOB_ID:-local}" "$code" "$PHASE" > "$JOB_REPORT/status.txt"
+  exit "$code"
 }
 trap record_exit EXIT
 trap 'exit 143' TERM
@@ -29,10 +38,11 @@ trap 'exit 130' INT
 export GS_OJCS_PROJECT="$PROJECT"
 export GS_OJCS_ATTEMPT="${SLURM_JOB_ID:-local}"
 source "$PROJECT/hpc/environment.sh"
-command -v flock >/dev/null || { echo 'ERROR: flock is required to protect this project environment' >&2; exit 2; }
-mkdir -p "$PROJECT/outputs/ojcs"
-exec 9>"$PROJECT/outputs/ojcs/.campaign.lock"
-flock -n 9 || { echo 'ERROR: another campaign is active in this project; retry after it finishes' >&2; exit 2; }
+source "$PROJECT/hpc/project_lock.sh"
+PHASE=project_lock
+gs_acquire_project_lock "$PROJECT"
+printf 'Acquired project guard for job %s.\n' "$GS_OJCS_ATTEMPT"
+PHASE=modules
 type module >/dev/null 2>&1 || { echo 'ERROR: environment modules unavailable in this login shell' >&2; exit 2; }
 module load anaconda3
 PHASE=dependencies
@@ -43,7 +53,8 @@ case "$PRESET" in smoke|audit|full) ;; *) echo 'ERROR: unknown diagnostic preset
 
 PHASE=verification
 "$PY" -m compileall -q "$PROJECT/gapslice" "$PROJECT/tests"
-"$PY" -m pytest "$PROJECT/tests/test_revision_feasibility.py" "$PROJECT/tests/test_revision_campaign.py" \
+"$PY" -m pytest "$PROJECT/tests/test_hpc_project_lock.py" \
+  "$PROJECT/tests/test_revision_feasibility.py" "$PROJECT/tests/test_revision_campaign.py" \
   "$PROJECT/tests/test_model_consistency.py" "$PROJECT/tests/test_channel.py" \
   "$PROJECT/tests/test_descriptor_tables.py" -q -p no:cacheprovider
 

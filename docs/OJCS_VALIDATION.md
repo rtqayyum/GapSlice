@@ -5,8 +5,8 @@ Verified on 17 November 2026. Inherited baseline: Git commit
 
 ## Executed locally
 
-- 21 selected tests passed: inherited model/channel/descriptor checks plus
-  new feasibility, failure propagation and resume checks.
+- 27 selected tests passed: inherited model/channel/descriptor checks plus
+  new feasibility, failure propagation, resume and project-guard checks.
 - All four synthetic diagnostic families completed in a real two-process local
   smoke run: four complete task records, zero failed and zero pending.
 - Additional synthetic boundary checks completed for blocked/limited-bandwidth
@@ -17,11 +17,16 @@ Verified on 17 November 2026. Inherited baseline: Git commit
 - The resume integration test deliberately fails a task, checks nonzero campaign
   status, executes the real radio task successfully, and verifies that a later
   invocation preserves the complete result without rerunning it.
+- Guard tests use real shell processes to check acquire/release, competing
+  owners, preserved unknown/changed ownership, and filesystem error reporting.
+  A controlled module-load failure exercises Batch twice and verifies that the
+  real failure phase is recorded and neither startup strands a guard.
 
 The complete scientific suite command used was:
 
 ```bash
-python -m pytest tests/test_revision_feasibility.py tests/test_revision_campaign.py \
+python -m pytest tests/test_hpc_project_lock.py \
+  tests/test_revision_feasibility.py tests/test_revision_campaign.py \
   tests/test_model_consistency.py tests/test_channel.py \
   tests/test_descriptor_tables.py -q -p no:cacheprovider
 ```
@@ -41,6 +46,9 @@ and a full rerun of every original experiment were outside these checks.
 ## Not executed or established
 
 - No Slurm job was submitted or run as part of this local verification.
+- Separately supplied cluster logs showed two earlier jobs stopping at the old
+  flock guard before experiments. That guard is replaced; its underlying
+  cluster filesystem failure mode was not established by those logs.
 - Cluster module versions, internet access for dependencies, memory availability,
   actual queue limits and multi-node shared filesystem behavior are unverified.
 - The 2,004-configuration audit and 25,308-configuration full diagnostic campaigns

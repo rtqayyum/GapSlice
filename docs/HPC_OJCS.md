@@ -21,6 +21,9 @@ mkdir -p logs results outputs figures tmp
 bash hpc/submit.sh smoke
 ```
 
+Submit each stage once using the helper. The direct `sbatch` example below is
+an alternative reference, not an additional command to run for the same stage.
+
 For an existing checkout, first inspect `git status --short` and the current
 branch. When it has no local source changes, `git pull --ff-only` updates this
 branch. Do not replace an existing directory, tracked results or checkpoints.
@@ -84,8 +87,16 @@ and installs `requirements-hpc.txt` into it. It never installs into
 module's Python version remain cluster-side checks; missing requirements cause
 a nonzero exit with the setup phase recorded. No Git is needed by Batch.
 
-One project lock prevents simultaneous submissions from changing the same
-environment or campaign outputs. It does not affect another project. Worker
+One project guard prevents simultaneous submissions from changing the same
+environment or campaign outputs. It uses directory creation at
+`outputs/ojcs/.campaign.guard`, records job/host/PID ownership, and requires no
+`flock` support from the shared filesystem. Normal and handled failure exits
+release only the current owner's guard. A pre-existing guard is reported with
+its metadata, not assumed to prove a currently running job. Filesystem creation
+errors have a separate diagnostic. The old `.campaign.lock` file is unused and
+can be left in place; deleting a kernel-lock file is not a recovery procedure.
+
+The guard does not affect another project. Worker
 BLAS/OpenMP thread counts are one, so 40 tasks do not each start 40 threads.
 Parallel work launches with `srun`, not on the login node.
 
@@ -142,6 +153,14 @@ Matching complete records are skipped. A source, environment or table change
 creates a new campaign identity rather than overwriting old evidence. Batch
 does not cancel any job. Do not run `scancel` on a job without first verifying
 its identity as belonging to this project.
+
+An unhandled kill or node failure can leave the directory guard behind. If that
+happens, inspect `outputs/ojcs/.campaign.guard/owner` and check the recorded job
+with `squeue` and `sacct`. Do not infer its status from an old PID on a different
+node. Guards are never reclaimed automatically. Only after confirming the owner
+is terminal and that no other campaign for this project is starting/running,
+preserve the abandoned guard by moving it to a unique archive name inside
+`outputs/ojcs/`, then resubmit once. No other project's files or jobs need changes.
 
 For a partial report, read the relevant job's manifest path:
 
