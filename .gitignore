@@ -7,3 +7,8 @@ build/
 dist/
 rerun/
 .DS_Store
+logs/
+outputs/
+tmp/
+.cache/
+.conda-git/

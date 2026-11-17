@@ -1,5 +1,11 @@
 # GapSlice
 
+> **OJ-CS research revision branch:** the inherited paper results below remain
+> unchanged. See the [revision plan](docs/OJCS_REVISION_PLAN.md) and
+> [GitHub-to-HPC instructions](docs/HPC_OJCS.md) for the new synthetic diagnostic
+> campaigns. This branch does not yet contain a finished revised method or
+> submission-ready new results.
+
 Reference implementation, results and figures of the paper
 
 > T. Qayyum, A. Lakas, A. Al Warafy, B. Brik, and M. A. Ferrag,

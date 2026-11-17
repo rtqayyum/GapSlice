@@ -1,0 +1,8 @@
+# Scientific versions verified locally for the OJ-CS diagnostic branch.
+# Python >=3.11 is required. The cluster environment is verified at runtime.
+numpy==2.3.5
+scipy==1.16.3
+cvxpy==1.9.2
+clarabel==0.11.1
+matplotlib==3.11.1
+pytest==8.4.2

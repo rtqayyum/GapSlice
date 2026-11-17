@@ -1,0 +1,78 @@
+#!/bin/bash -l
+#SBATCH --job-name=gs_ojcs_audit
+#SBATCH --partition=longq
+#SBATCH --ntasks=40
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=2G
+#SBATCH --time=23:00:00
+#SBATCH --output=/home/tariq.qayyum/hpc/GapSlice-OJCS/logs/%x_%j.out
+#SBATCH --error=/home/tariq.qayyum/hpc/GapSlice-OJCS/logs/%x_%j.err
+
+set -euo pipefail
+ulimit -c 0
+PROJECT=/home/tariq.qayyum/hpc/GapSlice-OJCS
+cd "$PROJECT"
+mkdir -p "$PROJECT/logs" "$PROJECT/results" "$PROJECT/outputs" "$PROJECT/figures" "$PROJECT/tmp"
+JOB_REPORT="$PROJECT/outputs/job-${SLURM_JOB_ID:-local}"
+mkdir -p "$JOB_REPORT"
+PHASE=setup
+record_exit() {
+  local code=$?
+  printf '{"job_id":"%s","exit_code":%s,"phase":"%s"}\n' \
+    "${SLURM_JOB_ID:-local}" "$code" "$PHASE" > "$JOB_REPORT/status.json"
+  printf 'Job %s exited with code %s during phase %s. Campaign outputs, if started, are under outputs/ojcs/.\n' \
+    "${SLURM_JOB_ID:-local}" "$code" "$PHASE" > "$JOB_REPORT/status.txt"
+}
+trap record_exit EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
+export GS_OJCS_PROJECT="$PROJECT"
+export GS_OJCS_ATTEMPT="${SLURM_JOB_ID:-local}"
+source "$PROJECT/hpc/environment.sh"
+command -v flock >/dev/null || { echo 'ERROR: flock is required to protect this project environment' >&2; exit 2; }
+mkdir -p "$PROJECT/outputs/ojcs"
+exec 9>"$PROJECT/outputs/ojcs/.campaign.lock"
+flock -n 9 || { echo 'ERROR: another campaign is active in this project; retry after it finishes' >&2; exit 2; }
+type module >/dev/null 2>&1 || { echo 'ERROR: environment modules unavailable in this login shell' >&2; exit 2; }
+module load anaconda3
+PHASE=dependencies
+bash "$PROJECT/hpc/bootstrap.sh"
+PY="$PROJECT/.venv/bin/python"
+PRESET="${GS_OJCS_PRESET:-audit}"
+case "$PRESET" in smoke|audit|full) ;; *) echo 'ERROR: unknown diagnostic preset' >&2; exit 2 ;; esac
+
+PHASE=verification
+"$PY" -m compileall -q "$PROJECT/gapslice" "$PROJECT/tests"
+"$PY" -m pytest "$PROJECT/tests/test_revision_feasibility.py" "$PROJECT/tests/test_revision_campaign.py" \
+  "$PROJECT/tests/test_model_consistency.py" "$PROJECT/tests/test_channel.py" \
+  "$PROJECT/tests/test_descriptor_tables.py" -q -p no:cacheprovider
+
+PHASE=manifest
+MANIFEST="$($PY -m gapslice.revision.campaign build --preset "$PRESET")"
+CAMPAIGN="$(basename "$MANIFEST" .json)"
+WORKER_LOGS="$PROJECT/logs/$CAMPAIGN/$GS_OJCS_ATTEMPT"
+mkdir -p "$WORKER_LOGS"
+printf '%s\n' "$MANIFEST" > "$PROJECT/outputs/ojcs/last_manifest.txt"
+mkdir -p "$PROJECT/outputs/ojcs/jobs"
+printf '%s\n' "$MANIFEST" > "$PROJECT/outputs/ojcs/jobs/${SLURM_JOB_ID}.manifest"
+"$PY" -m pip freeze > "$PROJECT/outputs/ojcs/${CAMPAIGN}_environment.txt"
+printf 'Campaign: %s\nManifest: %s\nWorkers: %s\n' "$CAMPAIGN" "$MANIFEST" "$SLURM_NTASKS"
+status=0
+PHASE=workers
+if srun --ntasks="$SLURM_NTASKS" --cpus-per-task=1 --kill-on-bad-exit=0 \
+  --output="$WORKER_LOGS/worker_%t.out" --error="$WORKER_LOGS/worker_%t.err" \
+  "$PY" -m gapslice.revision.campaign worker --manifest "$MANIFEST"; then
+  :
+else
+  status=$?
+fi
+PHASE=report
+if "$PY" -m gapslice.revision.campaign report --manifest "$MANIFEST"; then
+  :
+else
+  status=1
+fi
+printf 'Report: %s\nSummary: %s\nExit: %s\n' \
+  "$PROJECT/outputs/ojcs/$CAMPAIGN/report.md" "$PROJECT/outputs/ojcs/$CAMPAIGN/summary.json" "$status"
+PHASE=finished
+exit "$status"
