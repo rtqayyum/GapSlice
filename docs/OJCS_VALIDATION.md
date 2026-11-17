@@ -5,8 +5,8 @@ Verified on 17 November 2026. Inherited baseline: Git commit
 
 ## Executed locally
 
-- 27 selected tests passed: inherited model/channel/descriptor checks plus
-  new feasibility, failure propagation, resume and project-guard checks.
+- 32 selected tests passed: inherited model/channel/descriptor checks plus
+  new feasibility, failure propagation, resume, project-guard and runtime checks.
 - All four synthetic diagnostic families completed in a real two-process local
   smoke run: four complete task records, zero failed and zero pending.
 - Additional synthetic boundary checks completed for blocked/limited-bandwidth
@@ -21,11 +21,18 @@ Verified on 17 November 2026. Inherited baseline: Git commit
   owners, preserved unknown/changed ownership, and filesystem error reporting.
   A controlled module-load failure exercises Batch twice and verifies that the
   real failure phase is recorded and neither startup strands a guard.
+- Runtime tests create/reuse a real isolated venv, preserve incompatible inputs,
+  reject an external venv symlink and unverified installer, and simulate an old
+  module interpreter to verify managed-runtime selection and error propagation.
+- In a separate actual download check, the official pinned uv installer and
+  CPython 3.13.9 were installed inside a local validation project, and a seeded
+  isolated venv was created successfully. This check ran on macOS ARM64, not on
+  a Linux cluster. It did not install the scientific packages into that new venv.
 
 The complete scientific suite command used was:
 
 ```bash
-python -m pytest tests/test_hpc_project_lock.py \
+python -m pytest tests/test_hpc_project_lock.py tests/test_hpc_python_runtime.py \
   tests/test_revision_feasibility.py tests/test_revision_campaign.py \
   tests/test_model_consistency.py tests/test_channel.py \
   tests/test_descriptor_tables.py -q -p no:cacheprovider
@@ -49,6 +56,9 @@ and a full rerun of every original experiment were outside these checks.
 - Separately supplied cluster logs showed two earlier jobs stopping at the old
   flock guard before experiments. That guard is replaced; its underlying
   cluster filesystem failure mode was not established by those logs.
+- A subsequent cluster startup acquired the new guard and exposed a default
+  module Python older than 3.11. The managed-runtime fallback addresses that
+  prerequisite; full Linux preparation and worker execution remain unverified.
 - Cluster module versions, internet access for dependencies, memory availability,
   actual queue limits and multi-node shared filesystem behavior are unverified.
 - The 2,004-configuration audit and 25,308-configuration full diagnostic campaigns

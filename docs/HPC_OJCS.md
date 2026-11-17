@@ -18,7 +18,7 @@ git clone --branch ojcs-revision-20261117 --single-branch \
   /home/tariq.qayyum/hpc/GapSlice-OJCS
 cd /home/tariq.qayyum/hpc/GapSlice-OJCS
 mkdir -p logs results outputs figures tmp
-bash hpc/submit.sh smoke
+bash -l hpc/prepare.sh && bash hpc/submit.sh smoke
 ```
 
 Submit each stage once using the helper. The direct `sbatch` example below is
@@ -72,6 +72,7 @@ verified queue limit when bypassing the helper.
 Every generated file belongs to `/home/tariq.qayyum/hpc/GapSlice-OJCS`:
 
 - Python dependencies: `.venv/`; pip checks that it is the intended environment.
+- Managed Python, when needed: `.python/`; versioned uv binary/installer: `.tools/`.
 - Package/cache/bytecode files: `.cache/`; temporary files: `tmp/JOB_ID/`.
 - Immutable manifests: `outputs/ojcs/manifests/`.
 - New raw records and reports: `outputs/ojcs/CAMPAIGN_ID/`.
@@ -81,11 +82,32 @@ Every generated file belongs to `/home/tariq.qayyum/hpc/GapSlice-OJCS`:
 
 The tracked `results/` inputs remain read-only during diagnostics. Source code,
 dependency versions and both descriptor-table hashes identify each campaign.
-The batch script loads `anaconda3`, requires Python >=3.11, creates a local venv
-and installs `requirements-hpc.txt` into it. It never installs into
-`/cm/shared/apps/anaconda3`. Compute-node internet/wheel availability and the
-module's Python version remain cluster-side checks; missing requirements cause
-a nonzero exit with the setup phase recorded. No Git is needed by Batch.
+The batch script loads `anaconda3`, but does not require its default Python to
+be modern. Setup reuses a valid project venv or a compatible installed Python.
+Otherwise it installs uv 0.13.8 and CPython 3.13.9 under this project, then
+creates `.venv/`. The downloaded installer is checked against a pinned SHA256
+before execution; unmanaged installation disables shell-profile changes.
+All uv/Python caches and installation locations are explicitly project-local.
+An incompatible or incomplete `.venv/` is preserved under a timestamped backup
+inside the project; a `.venv` symlink is refused rather than modifying its target.
+
+Run `bash -l hpc/prepare.sh` once on the login node before submitting. This
+downloads/interprets dependencies only; it runs no scientific simulations.
+It installs `requirements-hpc.txt` into `.venv/`, requires binary wheels so it
+does not build large scientific packages on the login node, and checks imports.
+It never installs into `/cm/shared/apps/anaconda3`. Its log is
+`logs/prepare-TIMESTAMP-PID.log`; machine-readable runtime information is
+`outputs/setup/runtime.json` and the installed versions are in
+`outputs/setup/environment.txt`. Batch reuses the prepared environment, allowing
+compute nodes to run without repeating downloads. Outbound access and compatible
+Linux wheels must be available during preparation; failures are shown before a
+job is submitted when the preparation and submission commands are joined by `&&`.
+No Git is needed by Batch.
+
+To explicitly request the managed interpreter on a fresh setup, use
+`GS_OJCS_MANAGED_PYTHON=1 bash -l hpc/prepare.sh`. An existing compatible project
+venv is still reused. On x86-64, managed Python targets baseline x86_64 rather
+than an optimized CPU tier that might differ between login and compute nodes.
 
 One project guard prevents simultaneous submissions from changing the same
 environment or campaign outputs. It uses directory creation at
@@ -161,6 +183,8 @@ node. Guards are never reclaimed automatically. Only after confirming the owner
 is terminal and that no other campaign for this project is starting/running,
 preserve the abandoned guard by moving it to a unique archive name inside
 `outputs/ojcs/`, then resubmit once. No other project's files or jobs need changes.
+For a preparation guard with `job_id=local`, check the recorded host/PID on that
+same login host instead of looking up a nonexistent Slurm job.
 
 For a partial report, read the relevant job's manifest path:
 

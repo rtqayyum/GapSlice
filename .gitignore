@@ -12,3 +12,8 @@ outputs/
 tmp/
 .cache/
 .conda-git/
+.tools/
+.python/
+.config/
+.local/
+.venv.incompatible-*/
