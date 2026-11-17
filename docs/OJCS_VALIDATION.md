@@ -1,4 +1,4 @@
-# Local verification of the OJ-CS diagnostic branch
+# Verification of the OJ-CS diagnostic branch
 
 Verification began on 17 November 2026, with managed-runtime follow-up on
 18 November 2026. Inherited baseline: Git commit
@@ -53,26 +53,60 @@ SciPy 1.16.3, CVXPY 1.9.2, Clarabel 0.11.1, Matplotlib 3.11.1; pytest 8.4.2.
 Both local distributions used Python 3.13.9. Byte-identical regeneration of inherited PDF figures
 and a full rerun of every original experiment were outside these checks.
 
+## Cluster execution supplied by the project owner
+
+The owner submitted and ran these jobs. The analyst did not log into the
+cluster. Supplied logs and the downloaded audit export establish the following
+execution record; file/identity checks are internal consistency checks, not
+independent authentication of Slurm accounting.
+
+- Smoke job `3097319` completed with exit code 0 in 54 seconds: all 32 selected
+  checks passed and all four diagnostic tasks completed using four workers.
+  Campaign: `ojcs-smoke-7dde9f5a73400630`.
+- Audit job `3097320` completed with exit code 0 in 193 seconds: all 32 selected
+  checks passed and all 2,004 tasks completed using 40 workers. Campaign:
+  `ojcs-audit-169cb7962b787c5e`. There were no failed or pending records.
+- The worker step took 147 seconds. Results identify one compute host, `cn114`.
+  Task process CPU summed to 2,783.706 seconds. The largest cumulative
+  process RSS was 149.059 MiB; it is not aggregate job memory.
+- Offline verification on 18 November 2026 checked the manifest digest, every
+  task ID/configuration/status, exact result-file membership, family totals,
+  summary CPU/RSS accounting and all 59 source/input hashes against the local
+  checkout. Runtime and dependency details are preserved in the export.
+- Completion is distinct from scientific availability: the audit contains
+  36 radio and 144 control records reporting unavailable inherited descriptors.
+  Detailed findings and raw exported results remain in the owner's local audit
+  directory; no cluster-result archive is added to Git.
+
+The previous guard/module/venv startup failures are historical. The managed
+Python runtime resolves the base executable and uses symlinked venv binaries;
+subsequent preparation, fixture checks and both successful jobs exercised it.
+The original cluster filesystem failure underlying the old flock guard was
+not diagnosed.
+
+## Offline evidence analysis
+
+`scripts/analyze_ojcs_audit.py` analyzes an exported audit without rerunning
+scientific tasks or requiring the analyst's runtime to match the cluster.
+It produces a self-contained HTML report, PNG/SVG figure, JSON analysis and
+CSV tables with original result IDs. Raw inputs remain unchanged.
+Eight additional local checks exercise source/identity/accounting drift,
+missing/failed records, jointly feasible savings denominators, ACC-relative
+utility ratios and seed-cluster treatment. These checks are separate from
+the 32-check Slurm startup suite. All 40 checks passed together locally on
+18 November 2026. The real exported audit generated the HTML/JSON/CSV outputs
+and PNG/SVG figure; the figure was visually inspected and report artifact
+links were checked. No new simulation tasks were run for this analysis.
+
+See [the analysis workflow](OJCS_DIAGNOSTIC_ANALYSIS.md). The larger diagnostic
+preset is not the next research gate: analyze the inherited-model failures,
+revise the coupled model and freeze the final evaluation protocol first.
+
 ## Not executed or established
 
-- No Slurm job was submitted or run as part of this local verification.
-- Separately supplied cluster logs showed two earlier jobs stopping at the old
-  flock guard before experiments. That guard is replaced; its underlying
-  cluster filesystem failure mode was not established by those logs.
-- A subsequent cluster startup acquired the new guard and exposed a default
-  module Python older than 3.11. The managed-runtime fallback addressed that
-  prerequisite; later supplied logs confirmed Linux preparation and imports.
-- Later supplied logs confirmed Linux preparation and scientific-package imports
-  succeeded. A smoke job then passed 30 tests and failed two runtime fixtures
-  before experiments. Those failures were reproduced locally with the managed
-  interpreter: creating a copied venv through an alias broke library lookup.
-  Resolving the base executable and using venv symlinks fixes the reproduced
-  failures; the fixtures now verify pip as well as the Python prefix/version.
-- Login-node dependency downloads and imports are confirmed by supplied logs.
-  Successful scientific worker execution, peak memory and multi-node shared
-  filesystem behavior on the cluster remain unverified.
-- The 2,004-configuration audit and 25,308-configuration full diagnostic campaigns
-  have not been run by this verification.
+- Multi-node shared-filesystem execution remains unverified; all exported
+  audit task records identify the same compute host.
+- The 25,308-configuration full diagnostic campaign has not been executed.
 - All new diagnostic inputs are synthetic. There is no measured-data/testbed
   validation, new control proof, new full-maneuver guarantee, full NR compliance
   claim, formal privacy guarantee or completed revised manuscript.
