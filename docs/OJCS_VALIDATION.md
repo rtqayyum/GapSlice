@@ -1,6 +1,7 @@
 # Local verification of the OJ-CS diagnostic branch
 
-Verified on 17 November 2026. Inherited baseline: Git commit
+Verification began on 17 November 2026, with managed-runtime follow-up on
+18 November 2026. Inherited baseline: Git commit
 `e9b883da49cfbaedcfc3e284bfbd31dfdccbce77`.
 
 ## Executed locally
@@ -26,8 +27,11 @@ Verified on 17 November 2026. Inherited baseline: Git commit
   module interpreter to verify managed-runtime selection and error propagation.
 - In a separate actual download check, the official pinned uv installer and
   CPython 3.13.9 were installed inside a local validation project, and a seeded
-  isolated venv was created successfully. This check ran on macOS ARM64, not on
-  a Linux cluster. It did not install the scientific packages into that new venv.
+  isolated venv was created successfully. The pinned scientific requirements
+  were then installed into that clean environment, all 32 selected tests passed,
+  and all four smoke configurations executed successfully with two workers.
+  The same 32 tests also passed under the original Conda interpreter. These
+  local checks ran on macOS ARM64, not on a Linux cluster.
 
 The complete scientific suite command used was:
 
@@ -46,8 +50,7 @@ python -m gapslice.revision.campaign local --preset smoke --workers 2
 
 The scientific library versions matched `requirements-hpc.txt`: NumPy 2.3.5,
 SciPy 1.16.3, CVXPY 1.9.2, Clarabel 0.11.1, Matplotlib 3.11.1; pytest 8.4.2.
-The local interpreter was Python 3.13.9. No new environment installation was
-needed for those checks. Byte-identical regeneration of inherited PDF figures
+Both local distributions used Python 3.13.9. Byte-identical regeneration of inherited PDF figures
 and a full rerun of every original experiment were outside these checks.
 
 ## Not executed or established
@@ -57,10 +60,17 @@ and a full rerun of every original experiment were outside these checks.
   flock guard before experiments. That guard is replaced; its underlying
   cluster filesystem failure mode was not established by those logs.
 - A subsequent cluster startup acquired the new guard and exposed a default
-  module Python older than 3.11. The managed-runtime fallback addresses that
-  prerequisite; full Linux preparation and worker execution remain unverified.
-- Cluster module versions, internet access for dependencies, memory availability,
-  actual queue limits and multi-node shared filesystem behavior are unverified.
+  module Python older than 3.11. The managed-runtime fallback addressed that
+  prerequisite; later supplied logs confirmed Linux preparation and imports.
+- Later supplied logs confirmed Linux preparation and scientific-package imports
+  succeeded. A smoke job then passed 30 tests and failed two runtime fixtures
+  before experiments. Those failures were reproduced locally with the managed
+  interpreter: creating a copied venv through an alias broke library lookup.
+  Resolving the base executable and using venv symlinks fixes the reproduced
+  failures; the fixtures now verify pip as well as the Python prefix/version.
+- Login-node dependency downloads and imports are confirmed by supplied logs.
+  Successful scientific worker execution, peak memory and multi-node shared
+  filesystem behavior on the cluster remain unverified.
 - The 2,004-configuration audit and 25,308-configuration full diagnostic campaigns
   have not been run by this verification.
 - All new diagnostic inputs are synthetic. There is no measured-data/testbed

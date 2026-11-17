@@ -49,8 +49,12 @@ gs_prepare_python_runtime() {
     done
   fi
   if [ -n "$base" ]; then
+    # PATH entries may be aliases to an existing venv or standalone build.
+    # Resolve the base binary before creating another venv. Copying a managed
+    # binary can break its relative libpython lookup; Unix symlinks preserve it.
+    base="$("$base" -c 'import os,sys; print(os.path.realpath(getattr(sys,"_base_executable",sys.executable)))')" || return $?
     printf 'Creating project environment with compatible interpreter: %s\n' "$base"
-    "$base" -m venv --copies "$project/.venv" || return $?
+    "$base" -m venv --symlinks "$project/.venv" || return $?
   else
     uv_version=0.13.8
     python_target=3.13.9

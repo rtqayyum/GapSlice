@@ -42,6 +42,10 @@ class PythonRuntimeTests(unittest.TestCase):
         version, prefix = json.loads(result.stdout)
         self.assertGreaterEqual(version, [3, 11])
         self.assertEqual(Path(prefix).resolve(), (project/'.venv').resolve())
+        pip = subprocess.run([str(project/'.venv/bin/python'), '-m', 'pip', '--version'],
+                             capture_output=True, text=True)
+        self.assertEqual(pip.returncode, 0, pip.stderr)
+        self.assertIn('pip ', pip.stdout)
 
     def test_compatible_interpreter_creates_and_reuses_isolated_venv(self):
         with tempfile.TemporaryDirectory() as temp:

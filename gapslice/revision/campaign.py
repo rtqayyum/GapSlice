@@ -74,7 +74,11 @@ def fingerprint(root):
     files += [root/'results'/name for name in ['gain_curves.npz', 'tail_table.npz']]
     hashes = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
     versions = {p: importlib.metadata.version(p) for p in ['numpy', 'scipy', 'cvxpy', 'clarabel', 'matplotlib']}
-    return dict(files=hashes, versions=versions, python=platform.python_version())
+    return dict(files=hashes, versions=versions, python=platform.python_version(),
+                runtime=dict(system=platform.system(), machine=platform.machine(),
+                             implementation=platform.python_implementation(),
+                             compiler=platform.python_compiler(),
+                             base_prefix=str(Path(sys.base_prefix).resolve())))
 
 
 def configurations(preset):

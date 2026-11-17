@@ -23,4 +23,8 @@ mkdir -p "$PROJECT/logs" "$PROJECT/outputs/setup"
 LOG="$PROJECT/logs/prepare-$(date -u '+%Y%m%dT%H%M%SZ')-$$.log"
 printf 'Preparing only this project. Setup log: %s\n' "$LOG"
 bash "$PROJECT/hpc/bootstrap.sh" 2>&1 | tee "$LOG"
+printf 'Checking runtime and project guard before submission.\n' | tee -a "$LOG"
+"$PROJECT/.venv/bin/python" -m pytest \
+  "$PROJECT/tests/test_hpc_python_runtime.py" "$PROJECT/tests/test_hpc_project_lock.py" \
+  -q -p no:cacheprovider 2>&1 | tee -a "$LOG"
 printf 'Preparation completed. Runtime details: %s\n' "$PROJECT/outputs/setup/runtime.json"

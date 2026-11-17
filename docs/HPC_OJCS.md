@@ -104,6 +104,13 @@ Linux wheels must be available during preparation; failures are shown before a
 job is submitted when the preparation and submission commands are joined by `&&`.
 No Git is needed by Batch.
 
+Preparation also runs the runtime and project-guard checks before submission;
+scientific simulations stay in the batch job. Compatible interpreter aliases
+are resolved to their base installation and standard Unix venv symlinks are
+used, preserving the standalone interpreter's library lookup. Only executables
+inside the project environment link to their base interpreter; the `.venv`
+directory itself remains a real project-owned directory.
+
 To explicitly request the managed interpreter on a fresh setup, use
 `GS_OJCS_MANAGED_PYTHON=1 bash -l hpc/prepare.sh`. An existing compatible project
 venv is still reused. On x86-64, managed Python targets baseline x86_64 rather
@@ -176,6 +183,10 @@ creates a new campaign identity rather than overwriting old evidence. Batch
 does not cancel any job. Do not run `scancel` on a job without first verifying
 its identity as belonging to this project.
 
+The environment identity includes OS, architecture, Python implementation,
+compiler and base-installation path as well as library versions, so results
+from a Conda interpreter are not silently reused as a fresh managed-runtime run.
+
 An unhandled kill or node failure can leave the directory guard behind. If that
 happens, inspect `outputs/ojcs/.campaign.guard/owner` and check the recorded job
 with `squeue` and `sacct`. Do not infer its status from an old PID on a different
@@ -207,6 +218,6 @@ module load anaconda3
 Final/partial report paths are `outputs/ojcs/CAMPAIGN_ID/report.md`,
 `summary.json`, `metrics.csv` and `results/*.json`. Read `summary.json` for
 complete/failed/pending counts; a report file alone does not mean a run passed.
-Both diagnostics and inherited data are synthetic. Slurm execution, cluster
-runtime/memory limits and dependency installation are unverified until the
-smoke job actually runs on the cluster.
+Both diagnostics and inherited data are synthetic. Supplied cluster logs have
+confirmed successful project-local Linux dependency preparation; successful
+worker execution and full campaign completion still require a passing smoke job.
