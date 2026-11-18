@@ -6,6 +6,12 @@
 > campaigns. This branch does not yet contain a finished revised method or
 > submission-ready new results.
 
+> **New research prototype:** [GapSlice-Guard](docs/GUARD_METHOD.md) explores
+> trajectory-calibrated service profiles and joint slot/risk-budget allocation.
+> Use the [Guard HPC runbook](docs/HPC_GUARD.md) for its smoke/pilot jobs.
+> Its synthetic results, proposed novelty and remaining validation obligations
+> are separate from the inherited paper's claims below.
+
 Reference implementation, results and figures of the paper
 
 > T. Qayyum, A. Lakas, A. Al Warafy, B. Brik, and M. A. Ferrag,

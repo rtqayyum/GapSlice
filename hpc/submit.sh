@@ -24,4 +24,4 @@ done
 printf 'Submitting preset=%s partition=%s tasks=%s cpus/task=1 memory/cpu=2G time=%s GPU=none\n' \
   "$PRESET" "$PARTITION" "$TASKS" "$LIMIT"
 sbatch --parsable --job-name="$NAME" --partition="$PARTITION" --ntasks="$TASKS" --time="$LIMIT" \
-  --export="ALL,GS_OJCS_PRESET=$PRESET" "$PROJECT/Batch"
+  --export="ALL,GS_OJCS_STAGE=diagnostic,GS_OJCS_PRESET=$PRESET" "$PROJECT/Batch"

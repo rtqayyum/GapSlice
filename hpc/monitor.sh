@@ -8,10 +8,11 @@ sacct -j "$JOB" --format=JobID,JobName,State,ExitCode,Elapsed,TotalCPU,AllocCPUS
 # Batch may be idle while srun steps are active, so inspect both batch and worker steps.
 sstat -j "$JOB" --allsteps --format=JobID,NTasks,AveCPU,AveCPUFreq,AveRSS,MaxRSS,MaxVMSize || true
 if command -v seff >/dev/null 2>&1; then seff "$JOB" || true; fi
-if [ -f "$PROJECT/outputs/ojcs/jobs/$JOB.manifest" ]; then
-  MANIFEST="$(cat "$PROJECT/outputs/ojcs/jobs/$JOB.manifest")"
+for STAGE in ojcs guard; do
+if [ -f "$PROJECT/outputs/$STAGE/jobs/$JOB.manifest" ]; then
+  MANIFEST="$(cat "$PROJECT/outputs/$STAGE/jobs/$JOB.manifest")"
   CAMPAIGN="$(basename "$MANIFEST" .json)"
-  BASE="$PROJECT/outputs/ojcs/$CAMPAIGN"
+  BASE="$PROJECT/outputs/$STAGE/$CAMPAIGN"
   printf 'Campaign for this job: %s\n' "$CAMPAIGN"
   printf 'Worker records: '
   find "$BASE/workers/$JOB" -maxdepth 1 -name '*.json' -type f 2>/dev/null | wc -l || true
@@ -22,3 +23,4 @@ if [ -f "$PROJECT/outputs/ojcs/jobs/$JOB.manifest" ]; then
   tail -n 2 "$PROJECT/logs/$CAMPAIGN/$JOB"/progress-*.log 2>/dev/null || true
   printf 'Partial/final results: %s\nReport: %s\n' "$BASE/results" "$BASE/report.md"
 fi
+done

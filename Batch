@@ -28,8 +28,8 @@ record_exit() {
   fi
   printf '{"job_id":"%s","exit_code":%s,"phase":"%s"}\n' \
     "${SLURM_JOB_ID:-local}" "$code" "$PHASE" > "$JOB_REPORT/status.json"
-  printf 'Job %s exited with code %s during phase %s. Campaign outputs, if started, are under outputs/ojcs/.\n' \
-    "${SLURM_JOB_ID:-local}" "$code" "$PHASE" > "$JOB_REPORT/status.txt"
+  printf 'Job %s exited with code %s during phase %s. Campaign outputs, if started, are under outputs/%s/.\n' \
+    "${SLURM_JOB_ID:-local}" "$code" "$PHASE" "${OUTPUT_STAGE:-ojcs}" > "$JOB_REPORT/status.txt"
   exit "$code"
 }
 trap record_exit EXIT
@@ -49,8 +49,22 @@ source "$PROJECT/hpc/environment.sh"
 PHASE=dependencies
 bash "$PROJECT/hpc/bootstrap.sh"
 PY="$PROJECT/.venv/bin/python"
-PRESET="${GS_OJCS_PRESET:-audit}"
-case "$PRESET" in smoke|audit|full) ;; *) echo 'ERROR: unknown diagnostic preset' >&2; exit 2 ;; esac
+STAGE="${GS_OJCS_STAGE:-diagnostic}"
+case "$STAGE" in
+  diagnostic)
+    PRESET="${GS_OJCS_PRESET:-audit}"
+    case "$PRESET" in smoke|audit|full) ;; *) echo 'ERROR: unknown diagnostic preset' >&2; exit 2 ;; esac
+    CAMPAIGN_MODULE=gapslice.revision.campaign
+    OUTPUT_STAGE=ojcs
+    ;;
+  guard)
+    PRESET="${GS_OJCS_PRESET:-smoke}"
+    case "$PRESET" in smoke|pilot) ;; *) echo 'ERROR: unknown Guard prototype preset' >&2; exit 2 ;; esac
+    CAMPAIGN_MODULE=gapslice.guard.campaign
+    OUTPUT_STAGE=guard
+    ;;
+  *) echo 'ERROR: unknown experiment stage' >&2; exit 2 ;;
+esac
 
 PHASE=verification
 "$PY" -m compileall -q "$PROJECT/gapslice" "$PROJECT/tests"
@@ -58,33 +72,36 @@ PHASE=verification
   "$PROJECT/tests/test_revision_feasibility.py" "$PROJECT/tests/test_revision_campaign.py" \
   "$PROJECT/tests/test_model_consistency.py" "$PROJECT/tests/test_channel.py" \
   "$PROJECT/tests/test_descriptor_tables.py" -q -p no:cacheprovider
+if [ "$STAGE" = guard ]; then
+  "$PY" -m pytest "$PROJECT/tests/test_guard_method.py" -q -p no:cacheprovider
+fi
 
 PHASE=manifest
-MANIFEST="$($PY -m gapslice.revision.campaign build --preset "$PRESET")"
+MANIFEST="$($PY -m "$CAMPAIGN_MODULE" build --preset "$PRESET")"
 CAMPAIGN="$(basename "$MANIFEST" .json)"
 WORKER_LOGS="$PROJECT/logs/$CAMPAIGN/$GS_OJCS_ATTEMPT"
 mkdir -p "$WORKER_LOGS"
-printf '%s\n' "$MANIFEST" > "$PROJECT/outputs/ojcs/last_manifest.txt"
-mkdir -p "$PROJECT/outputs/ojcs/jobs"
-printf '%s\n' "$MANIFEST" > "$PROJECT/outputs/ojcs/jobs/${SLURM_JOB_ID}.manifest"
-"$PY" -m pip freeze > "$PROJECT/outputs/ojcs/${CAMPAIGN}_environment.txt"
+printf '%s\n' "$MANIFEST" > "$PROJECT/outputs/$OUTPUT_STAGE/last_manifest.txt"
+mkdir -p "$PROJECT/outputs/$OUTPUT_STAGE/jobs"
+printf '%s\n' "$MANIFEST" > "$PROJECT/outputs/$OUTPUT_STAGE/jobs/${SLURM_JOB_ID}.manifest"
+"$PY" -m pip freeze > "$PROJECT/outputs/$OUTPUT_STAGE/${CAMPAIGN}_environment.txt"
 printf 'Campaign: %s\nManifest: %s\nWorkers: %s\n' "$CAMPAIGN" "$MANIFEST" "$SLURM_NTASKS"
 status=0
 PHASE=workers
 if srun --ntasks="$SLURM_NTASKS" --cpus-per-task=1 --kill-on-bad-exit=0 \
   --output="$WORKER_LOGS/worker_%t.out" --error="$WORKER_LOGS/worker_%t.err" \
-  "$PY" -m gapslice.revision.campaign worker --manifest "$MANIFEST"; then
+  "$PY" -m "$CAMPAIGN_MODULE" worker --manifest "$MANIFEST"; then
   :
 else
   status=$?
 fi
 PHASE=report
-if "$PY" -m gapslice.revision.campaign report --manifest "$MANIFEST"; then
+if "$PY" -m "$CAMPAIGN_MODULE" report --manifest "$MANIFEST"; then
   :
 else
   status=1
 fi
 printf 'Report: %s\nSummary: %s\nExit: %s\n' \
-  "$PROJECT/outputs/ojcs/$CAMPAIGN/report.md" "$PROJECT/outputs/ojcs/$CAMPAIGN/summary.json" "$status"
+  "$PROJECT/outputs/$OUTPUT_STAGE/$CAMPAIGN/report.md" "$PROJECT/outputs/$OUTPUT_STAGE/$CAMPAIGN/summary.json" "$status"
 PHASE=finished
 exit "$status"

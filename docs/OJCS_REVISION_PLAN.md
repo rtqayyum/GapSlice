@@ -4,6 +4,14 @@ Status: research protocol and diagnostic infrastructure. A revised method,
 new proofs, final experiments and a submission-ready manuscript are pending.
 This plan makes no claim about journal acceptance or journal ranking.
 
+Following analysis of the completed inherited-model audit, a separate
+[GapSlice-Guard prototype](GUARD_METHOD.md) now implements a different
+finite-horizon service-synthesis path. It uses qualified risk/resource profiles,
+checked packet-copy geometry and a fleet risk budget. The prior-art matrix and
+open novelty/validation obligations are explicit. Its
+[HPC smoke/pilot workflow](HPC_GUARD.md) replaces expanding the old diagnostic
+grid as the next implementation step; it does not complete the gates below.
+
 ## Research question and positioning
 
 Can a network operator turn a fleet's declared control requirement into an
