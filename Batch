@@ -63,6 +63,11 @@ case "$STAGE" in
     CAMPAIGN_MODULE=gapslice.guard.campaign
     OUTPUT_STAGE=guard
     ;;
+  certified)
+    PRESET="${GS_OJCS_PRESET:-smoke}"
+    case "$PRESET" in smoke|research) ;; *) echo 'ERROR: unknown certificate preset' >&2; exit 2 ;; esac
+    OUTPUT_STAGE=cert
+    ;;
   *) echo 'ERROR: unknown experiment stage' >&2; exit 2 ;;
 esac
 
@@ -74,6 +79,14 @@ PHASE=verification
   "$PROJECT/tests/test_descriptor_tables.py" -q -p no:cacheprovider
 if [ "$STAGE" = guard ]; then
   "$PY" -m pytest "$PROJECT/tests/test_guard_method.py" -q -p no:cacheprovider
+fi
+
+if [ "$STAGE" = certified ]; then
+  "$PY" -m pytest "$PROJECT/tests/test_certified_method.py" "$PROJECT/tests/test_certified_campaign.py" -q -p no:cacheprovider
+  PHASE=certified_pipeline
+  "$PY" -m gapslice.certified.campaign run --preset "$PRESET" --workers "$SLURM_NTASKS"
+  PHASE=finished
+  exit 0
 fi
 
 PHASE=manifest

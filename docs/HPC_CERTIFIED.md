@@ -1,0 +1,199 @@
+# GapSlice-Cert: full CPU research study
+
+This package is the complete redesign entrypoint. It preserves all old Guard
+and diagnostic code/results. The scientific scope and conditional arguments
+are in [CERTIFIED_PROOFS.md](CERTIFIED_PROOFS.md). Better performance and journal
+acceptance remain empirical/editorial questions. No external measured data are
+included. Nothing registers Red Hat systems or touches another project.
+
+## Execute on the university login node
+
+```bash
+module load slurm
+cd /home/tariq.qayyum/hpc/GapSlice-OJCS &&
+git pull --ff-only origin ojcs-revision-20261117 &&
+bash -l hpc/prepare.sh &&
+bash -l hpc/run_certified.sh research
+```
+
+The launcher checks `sbatch --test-only` for both allocations before submitting.
+It prints the actual two job IDs and stores a submission receipt. It submits
+`gs_cert_smoke` (4 CPUs, 2 GiB/CPU, shortq), then `gs_cert_research` (160 CPUs,
+4 GiB/CPU, longq), dependent on smoke success. Both use the **current partition
+MaxTime reported by scontrol** (previously shortq 2 days, longq 20 days),
+1 CPU/task and no GPU. These are maximum reservations, not predicted runtimes.
+Slurm may queue or reject the request based on account/QOS limits. Account
+limits, disk quota and cluster speed have not been inspected remotely.
+`sbatch --test-only` validates scheduler arguments and estimates scheduling;
+it does not execute application code ([Slurm documentation](https://slurm.schedmd.com/sbatch.html)).
+
+To change CPU parallelism without changing the scientific protocol:
+
+```bash
+GS_CERT_CPUS=320 bash -l /home/tariq.qayyum/hpc/GapSlice-OJCS/hpc/run_certified.sh research
+```
+
+160 is the default to limit filesystem pressure while making independent CPU
+replays parallel. No CUDA workload exists. Do not keep increasing workers
+without checking CPU efficiency, shared-filesystem throughput and account limits.
+
+Exact underlying research submission, if submitting individually is necessary:
+
+```bash
+sbatch --job-name=gs_cert_research --partition=longq \
+  --ntasks=160 --cpus-per-task=1 --mem-per-cpu=4G --time=20-00:00:00 \
+  --chdir=/home/tariq.qayyum/hpc/GapSlice-OJCS \
+  --export=ALL,GS_OJCS_STAGE=certified,GS_OJCS_PRESET=research \
+  /home/tariq.qayyum/hpc/GapSlice-OJCS/Batch
+```
+
+Prefer the launcher: it queries the actual queue maximum rather than hardcoding
+20 days, preflights allocations, and automatically gates research on smoke.
+Do not also submit Batch with its old default diagnostic stage.
+
+## What runs
+
+The frozen protocol spans 72 contract groups: N=3/5/7 trucks, requested
+headway 0.6/0.8/1.0/1.2 seconds, capacity 51/106 PRBs, payload 300/600/1200 bytes.
+Initial headway is 1.5 seconds. Every controller uses the same actuator limits,
+bounded sensors, physical plant, reference governor and safety filter.
+
+* **151,668 design candidates**, including fused/hold/radar predictor modes,
+  three gain tuples, radio-free operation, feasible serial/parallel schedules,
+  phase offsets 0/20/40/60/80 ms, PRB widths 10 through100 where feasible,
+  and 1/2/4 copies with clustered/spread/hopped geometry.
+* **29,120,256 design episode replays**, 64/candidate/environment over nominal,
+  correlated and blocked synthetic channels. These choose gains and candidates.
+* Freeze one gain per contract/controller. Keep the design-best parallel and
+  serial option for each phase/domain, plus the zero-radio option. At most
+  **4,536** candidates survive; duplicates across domains reduce the actual count.
+* For every frozen candidate/environment: **32,768 calibration +32,768 fresh
+  held-out episodes**, in fixed storage shards of 2,048 (numerical microbatches of128). At most **891,813,888** combined
+  replays. Test data never select the bank, risk label or admission policy.
+* Calibration-based representative no-shield/perfect-radio ablations and harder
+  plant shifts (108 km/h slow actuators and 60 km/h alternating actuator lags,
+  hard -6 m/s² braking). Matched ablations use exactly the first held-out batch's
+  seed, dimensions, source phase and batch size; shifts are labeled separately.
+* Multi-tenant admissions for 4/8/16/32 requests at both capacities and declared
+  domains; fused, hold, radar, parallel-only and synchronous-only comparisons;
+  greedy and MILP packing; exact independent integer relaxation bounds.
+
+Episodes are 40-second nonlinear replays at 2 ms physics/10 ms control ticks.
+This is a heavy synthetic study, not a request to repeat the old 2,040-cell
+pilot. The maximum replay count includes zero-radio repeats across payload/cap
+contracts; they retain comparable per-contract tuning budgets and provenance.
+A future efficiency improvement may reuse them only with explicit provenance.
+
+## Resources and storage
+
+Actual local development timing: a 64-episode, N=5, blocked, 40-second replay
+took about4.8 seconds on this Mac. An N=7, 2,048-episode replay took237 seconds and peaked near808 MiB; a128-episode microbatch peaked near231 MiB. This is not a cluster runtime estimate;
+large-batch cost, memory, interconnect/filesystem and node CPU differ. The job
+records each task's CPU/wall time and peak process RSS. Plan for a multi-day
+160-CPU run and potentially tens of thousands of core-hours. It may need a
+resume if it reaches the queue limit. No completion-time promise is made.
+
+Allow approximately **200 GiB free and at least 2.5 million free inodes**, with
+quota checked separately. Actual compression/selection changes storage use.
+There are at most217,728 calibration shards and the same test shard count,
+plus455,004 design shards; each has a JSON commit marker and compressed NPZ.
+Result paths are split into256 hash-prefix directories per stage; directory metadata can still be substantial. All generated files remain
+inside `/home/tariq.qayyum/hpc/GapSlice-OJCS/`, including .venv and caches.
+The shared Anaconda installation is loaded read-only and is never modified.
+
+```bash
+df -h /home/tariq.qayyum/hpc/GapSlice-OJCS
+df -i /home/tariq.qayyum/hpc/GapSlice-OJCS
+quota -s
+```
+
+`df` capacity is not an account quota check. There is no automatic deletion or
+resubmission loop. Partial results survive timeouts and failures.
+
+## Monitor and recover
+
+Replace JOB_ID with the **research job ID printed by the launcher**:
+
+```bash
+bash /home/tariq.qayyum/hpc/GapSlice-OJCS/hpc/monitor.sh JOB_ID
+squeue -u tariq.qayyum
+sacct -j JOB_ID --format=JobID,JobName%24,State,ExitCode,Elapsed,TotalCPU,MaxRSS,AllocTRES%30
+sstat -j JOB_ID --allsteps --format=JobID,NTasks,AveCPU,AveRSS,MaxRSS,MaxVMSize
+tail -f /home/tariq.qayyum/hpc/GapSlice-OJCS/logs/gs_cert_research_JOB_ID.out
+tail -f /home/tariq.qayyum/hpc/GapSlice-OJCS/logs/gs_cert_research_JOB_ID.err
+```
+
+`monitor.sh` shows per-stage completed/failed task counts, worker records and
+recent progress. Task episode counts are declared in each manifest. After a
+stage finishes, summary.json records its expected/complete counts. The final
+summary.json records held-out episode counts. Use `seff JOB_ID` for post-job
+CPU/memory efficiency where available. `sstat` needs a currently running step.
+
+```bash
+STUDY="$(cat /home/tariq.qayyum/hpc/GapSlice-OJCS/outputs/cert/jobs/JOB_ID.study)"
+find "$STUDY" -name '*.failed.json' -print
+rg -n 'FAILED|Traceback|certificate.*violated|ERROR|oom|killed' \
+  /home/tariq.qayyum/hpc/GapSlice-OJCS/logs/"$(basename "$STUDY")"/
+```
+
+Recovery, after the failed/time-limited job has ended, with the **same source
+commit, Python environment and protocol**:
+
+```bash
+bash -l /home/tariq.qayyum/hpc/GapSlice-OJCS/hpc/run_certified.sh resume
+```
+
+This submits only the research job. It checks existing raw-data hashes and
+resumes unfinished tasks. Successful results are never overwritten. Orphan
+NPZ/failed attempt records are preserved. Any required-task failure exits
+nonzero; a scientific bound breach aborts rather than becoming a successful
+count. If smoke fails, research stays blocked by afterok; inspect the error
+before using resume. No script cancels jobs. Identify this project's explicit
+job IDs yourself before canceling any obsolete pending dependency.
+
+Source/runtime/protocol changes create a new immutable study ID; they cannot
+silently reuse old scientific results. Do not pull or edit source during a run.
+Revising after held-out inspection requires a fresh final namespace and review.
+
+## Results and transfer
+
+For a completed job:
+
+```bash
+STUDY="$(cat /home/tariq.qayyum/hpc/GapSlice-OJCS/outputs/cert/jobs/JOB_ID.study)"
+cat "$STUDY/summary.json"
+cat "$STUDY/report.md"
+printf '%s\n' "$STUDY/analysis_bundle.tar.gz"
+```
+
+The small bundle includes protocol/source provenance, design selection,
+qualification, test-cell counts, diagnostics, allocations, proof checks and
+report. Full per-episode vectors remain under each phase's `results/`.
+`outputs/cert/last_study.txt` points to the latest launched study.
+
+The requested source upload is GitHub based; `git pull --ff-only` above is the
+exact HPC download command after this branch is pushed. An alternative explicit
+Mac source upload, excluding generated artifacts, is:
+
+```bash
+rsync -az --progress --exclude='.git/' --exclude='.venv/' --exclude='.tools/' \
+  --exclude='.cache/' --exclude='.python/' --exclude='logs/' --exclude='results/' \
+  --exclude='outputs/' --exclude='tmp/' --exclude='figures/' \
+  /Users/rana/Documents/GapSlice-Trucks/v4_ojcs/repository/ \
+  tariq.qayyum@10.90.24.15:/home/tariq.qayyum/hpc/GapSlice-OJCS/
+```
+
+Prefer GitHub to maintain source provenance. Existing tracked legacy result
+inputs already present in the checkout are required by source fingerprinting;
+do not exclude them from an initial clone. Never overwrite HPC outputs by rsync.
+
+## Execution evidence
+
+Local unit/proof checks and a real full smoke pipeline are executed on the Mac.
+They exercise synthetic episodes, not real truck/channel measurements. Mock
+Slurm tests check submission arguments/dependencies without submitting jobs.
+The new research job and its Slurm resource compatibility remain unexecuted
+until the user runs the command; earlier successful Guard jobs do not validate
+this new implementation. Numerical verification supports, and does not replace,
+the conditional mathematical arguments. External calibration, faithful additional
+published baselines and independent theorem review remain publication work.

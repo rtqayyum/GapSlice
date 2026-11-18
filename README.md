@@ -1,5 +1,11 @@
 # GapSlice
 
+> **Full redesign (2026-11-18):** [GapSlice-Cert proofs and assumptions](docs/CERTIFIED_PROOFS.md)
+> and [one-command HPC study](docs/HPC_CERTIFIED.md). This is a separate implementation
+> with backup braking envelopes, stale-information bounds, exact finite-family risk
+> qualification and cyclic admission. Real-data validation and final novelty review
+> remain outstanding. Previous artifacts below are preserved.
+
 > **OJ-CS research revision branch:** the inherited paper results below remain
 > unchanged. See the [revision plan](docs/OJCS_REVISION_PLAN.md) and
 > [GitHub-to-HPC instructions](docs/HPC_OJCS.md) for the new synthetic diagnostic
