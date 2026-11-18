@@ -107,7 +107,9 @@ tail -f "$PROJECT/logs/gs_guard_smoke_${JOB}.err"
 For pilot, replace `gs_guard_smoke` with `gs_guard_pilot`. `sstat` can report no
 active steps after completion. CPU utilization is best assessed from final
 `sacct`/`seff` accounting; do not interpret broken memory denominators as real
-memory usage.
+memory usage. If the live queue returns `Invalid job id`, the monitor continues
+to accounting and stored campaign files. A queue-lookup failure alone does not
+establish the experiment's success or failure; inspect its logs and exit status.
 
 After the job has created its manifest mapping:
 

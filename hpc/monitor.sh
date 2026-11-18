@@ -3,8 +3,12 @@ set -euo pipefail
 PROJECT=/home/tariq.qayyum/hpc/GapSlice-OJCS
 JOB="${1:?Usage: bash hpc/monitor.sh JOB_ID}"
 case "$JOB" in *[!0-9]*) echo 'Expected a numeric Slurm job ID' >&2; exit 2 ;; esac
-squeue -j "$JOB" -o '%.18i %.22j %.10P %.8T %.10M %.6C %R'
-sacct -j "$JOB" --format=JobID,JobName,State,ExitCode,Elapsed,TotalCPU,AllocCPUS,MaxRSS,AllocTRES%30
+if ! squeue -j "$JOB" -o '%.18i %.22j %.10P %.8T %.10M %.6C %R'; then
+  printf 'Live queue lookup unavailable for job %s; continuing to accounting and stored results.\n' "$JOB"
+fi
+if ! sacct -j "$JOB" --format=JobID,JobName,State,ExitCode,Elapsed,TotalCPU,AllocCPUS,MaxRSS,AllocTRES%30; then
+  printf 'Accounting lookup unavailable for job %s; continuing to stored results.\n' "$JOB"
+fi
 # Batch may be idle while srun steps are active, so inspect both batch and worker steps.
 sstat -j "$JOB" --allsteps --format=JobID,NTasks,AveCPU,AveCPUFreq,AveRSS,MaxRSS,MaxVMSize || true
 if command -v seff >/dev/null 2>&1; then seff "$JOB" || true; fi

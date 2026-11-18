@@ -1,8 +1,8 @@
 # Guard prototype verification, 18 November 2026
 
-Executed locally on macOS ARM64 with Python 3.13.9 and the pinned scientific
-requirements. The cluster commands below are prepared for execution by the
-project owner; no new cluster job is claimed here.
+The local checks below ran on macOS ARM64 with Python 3.13.9 and the pinned
+scientific requirements. Later cluster logs supplied by the project owner
+are recorded separately below; the analyst did not log into the HPC.
 
 - 63 selected checks passed together: 23 new Guard checks, eight offline audit
   analysis checks and the 32 previously selected runtime/model/diagnostic checks.
@@ -45,8 +45,27 @@ dependencies or shared-Conda writes were introduced. Outputs/caches remain
 project-local, inherited inputs/results remain unchanged and raw local evidence
 is excluded from Git.
 
-Unverified: Linux/Slurm execution of this new module, its exploratory pilot,
-multi-node operation, real PHY curves and signaling, measured/testbed data,
+## Subsequently supplied cluster logs
+
+- Smoke job `3098512`, campaign `guard-smoke-c61d9db8317043f5`, completed with
+  Slurm exit `0:0` in 57 s. All 55 selected startup checks and 10 tasks passed.
+- Pilot job `3098556`, campaign `guard-pilot-3915091fe85a87dc`, reports application
+  exit 0, 55 passed startup checks, 2,040/2,040 completed tasks, 40 completed
+  workers and zero failed/pending tasks. Recorded task CPU is 13,960.422 s;
+  the largest cumulative worker-process RSS is 72.754 MiB. Final Slurm accounting
+  and the raw export have not yet been inspected for this pilot.
+- A live `squeue` lookup for the pilot returned `Invalid job id`, causing the
+  old `set -e` monitor to stop before accounting/stored-result inspection. The
+  monitor now continues after queue/accounting lookup failures. Two isolated
+  shell-command capture checks exercised an invalid queue ID with accounting
+  both available and unavailable, and confirmed stored-result/progress output.
+
+These supplied logs establish execution progress, not comparative scientific
+performance or independent authentication. Export and analyze the frozen pilot
+before updating its HPC checkout; the manifest fingerprints execution scripts
+as well as scientific source.
+
+Unverified: detailed pilot results, multi-node operation, real PHY curves and signaling, measured/testbed data,
 independent backend agreement, a reliable operating-domain classifier,
 application-grounded tolerances, comprehensive grid convergence, continuous-time
 safety or string-stability proofs, novelty beyond the identified prior art and
