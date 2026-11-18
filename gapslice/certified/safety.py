@@ -20,6 +20,17 @@ def up(x):return np.nextafter(x,np.inf)
 def down(x):return np.nextafter(x,-np.inf)
 
 
+def close_memmap(array):
+    """Close an exclusively owned np.load/open_memmap mapping.
+
+    NumPy 2.3 has no public memmap.close(). Its backing mmap supports close,
+    but callers must first stop using all arrays/views of that mapping.
+    These table mappings are owned by their builder or a single Shield.
+    """
+    mapping=getattr(array,'_mmap',None)
+    if mapping is not None and not mapping.closed:mapping.close()
+
+
 def exp_integral_bounds(h,eta,terms=12):
     """Enclose exp(-h/eta) and its integral with bounded Taylor remainders.
 
@@ -175,14 +186,16 @@ def ensure_tables(root,b=None):
         maximum_v=up(sh+np.maximum(b.maximum_speed,ch))
         if np.any(a>-b.terminal_brake) or np.any(u>-b.terminal_brake) or np.any(maximum_v>1e-5):
             raise RuntimeError('Factorized envelope did not reach its terminal braking tail')
-        out.flush();del out
+        out.flush();close_memmap(out);del out
     out=np.lib.format.open_memmap(staging/'predecessor.npy',mode='w+',dtype='float64',shape=(len(aa),n+1))
     a=aa.copy();s=np.zeros_like(a);out[:,0]=0.
     for k in range(n):
         a=np.maximum(-b.brake,down(a-up(b.actual_jerk_bound*h)))
         s=down(s+down(a*h));out[:,k+1]=s
-    out.flush();del out
-    hashes={p.name:hashlib.file_digest(p.open('rb'),'sha256').hexdigest() for p in staging.glob('*.npy')}
+    out.flush();close_memmap(out);del out
+    hashes={}
+    for p in staging.glob('*.npy'):
+        with p.open('rb') as stream:hashes[p.name]=hashlib.file_digest(stream,'sha256').hexdigest()
     meta=dict(schema=2,bounds=asdict(b),table_id=b.key,actual_jerk_upper_from_command=jerk,
         array_hashes=hashes,ego_states=len(ae),predecessor_states=len(aa),
         proof='Outward interval arithmetic, monotone initial-state rounding, between-knot displacement enclosure, terminal stopping tail',
@@ -195,6 +208,7 @@ def ensure_tables(root,b=None):
 
 class Shield:
     def __init__(self,path,verify_hashes=True):
+        self._closed=False
         path=Path(path);self.metadata=json.loads((path/'certificate.json').read_text())
         self.bounds=Bounds(**self.metadata['bounds']);self.bounds.check()
         if verify_hashes:
@@ -203,11 +217,29 @@ class Shield:
                     if hashlib.file_digest(f,'sha256').hexdigest()!=expected:raise RuntimeError('Proof-table hash mismatch')
         if self.metadata['schema']!=2:raise ValueError('Unsupported proof-table schema')
         self.acceleration,self.command=axes(self.bounds)
-        self.emergency=np.load(path/'emergency.npy',mmap_mode='r')
-        self.nominal=np.load(path/'nominal_block.npy',mmap_mode='r')
-        self.predecessor=np.load(path/'predecessor.npy',mmap_mode='r')
+        try:
+            self.emergency=np.load(path/'emergency.npy',mmap_mode='r')
+            self.nominal=np.load(path/'nominal_block.npy',mmap_mode='r')
+            self.predecessor=np.load(path/'predecessor.npy',mmap_mode='r')
+        except BaseException:
+            self.close()
+            raise
+
+    def close(self):
+        """Release owned mappings before removing tables, including on NFS."""
+        for name in ['emergency','nominal','predecessor']:
+            close_memmap(getattr(self,name,None))
+            setattr(self,name,None)
+        self._closed=True
+
+    def __enter__(self):
+        if self._closed:raise RuntimeError('Proof-table mappings are closed')
+        return self
+
+    def __exit__(self,exc_type,exc,tb):self.close()
 
     def required_clearance(self,own_v_hi,own_a_hi,command,pred_v_lo,pred_a_lo,prefix=True):
+        if self._closed:raise RuntimeError('Proof-table mappings are closed')
         arrays=np.broadcast_arrays(own_v_hi,own_a_hi,command,pred_v_lo,pred_a_lo)
         shape=arrays[0].shape;v,a,u,pv,pa=[np.asarray(x).ravel() for x in arrays]
         valid=(np.isfinite(v)&np.isfinite(a)&np.isfinite(u)&np.isfinite(pv)&np.isfinite(pa)&

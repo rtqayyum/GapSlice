@@ -22,7 +22,39 @@ class CertifiedTests(unittest.TestCase):
         cls.temp=tempfile.TemporaryDirectory();cls.tables=ensure_tables(Path(cls.temp.name));cls.shield=Shield(cls.tables)
 
     @classmethod
-    def tearDownClass(cls):cls.temp.cleanup()
+    def tearDownClass(cls):
+        # On NFS, unlinking an open mapped file can leave a .nfs placeholder
+        # and make TemporaryDirectory.cleanup fail with ENOTEMPTY.
+        cls.shield.close()
+        cls.temp.cleanup()
+
+    def test_mapping_lifetime_normal_and_exceptional_exit(self):
+        for fail in [False,True]:
+            with self.subTest(exceptional=fail):
+                try:
+                    with Shield(self.tables) as shield:
+                        mappings=[a._mmap for a in [shield.emergency,shield.nominal,shield.predecessor]]
+                        self.assertTrue(all(not m.closed for m in mappings))
+                        if fail:raise ValueError('forced check failure')
+                except ValueError:
+                    if not fail:raise
+                self.assertTrue(all(m.closed for m in mappings))
+                shield.close()  # idempotent
+                with self.assertRaisesRegex(RuntimeError,'closed'):
+                    shield.required_clearance(20.,0.,0.,20.,-6.)
+
+    def test_verifier_releases_mappings_when_a_check_fails(self):
+        from unittest.mock import patch
+        mappings=[]
+        def open_shield(*args,**kwargs):
+            shield=Shield(*args,**kwargs)
+            mappings.extend(a._mmap for a in [shield.emergency,shield.nominal,shield.predecessor])
+            return shield
+        with patch('gapslice.certified.verification._verify',side_effect=ValueError('forced')):
+            with patch('gapslice.certified.verification.Shield',side_effect=open_shield):
+                with self.assertRaises(ValueError):verify(self.tables,1)
+        self.assertEqual(len(mappings),3)
+        self.assertTrue(all(m.closed for m in mappings))
 
     def test_independent_numerical_verifier(self):
         self.assertEqual(verify(self.tables,32)['status'],'passed')

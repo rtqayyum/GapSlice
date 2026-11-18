@@ -208,6 +208,15 @@ def run_task(manifest_path,item,table_path):
 
 
 def worker(manifest_path,table_path,rank,size):
+    global _SHIELD
+    try:return _worker(manifest_path,table_path,rank,size)
+    finally:
+        if _SHIELD is not None:
+            _SHIELD.close()
+            _SHIELD=None
+
+
+def _worker(manifest_path,table_path,rank,size):
     m=read_manifest(manifest_path)
     identity=json.loads((Path(manifest_path).parent.parent/'identity.json').read_text())
     if identity['id']!=m['study'] or identity['source']!=source():raise RuntimeError('Worker source/runtime mismatch')

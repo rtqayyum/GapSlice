@@ -112,6 +112,26 @@ resubmission loop. Partial results survive timeouts and failures.
 
 ## Monitor and recover
 
+If smoke job3098812 failed only in temporary proof-table cleanup, pull the
+mapping-lifetime fix before retrying. All17 functional checks passed in that
+attempt; the simulation campaign had not started. Job3098813 belongs to this
+project and has an impossible afterok dependency on that failed smoke. Replace
+that specific stale submission with a fresh smoke-gated pair:
+
+```bash
+cd /home/tariq.qayyum/hpc/GapSlice-OJCS &&
+git pull --ff-only origin ojcs-revision-20261117 &&
+bash -l hpc/prepare.sh &&
+scancel 3098813 &&
+bash -l /home/tariq.qayyum/hpc/GapSlice-OJCS/hpc/run_certified.sh research
+```
+
+This cancels only the identified, never-started project job; it does not touch
+the user's other jobs. If3098813 was already removed, proceed with the launcher
+after the successful pull/preparation. See CERTIFIED_VERIFICATION.md for the
+failure evidence and local checks. Current queue estimates remain unverified
+until the new submission is inspected.
+
 Replace JOB_ID with the **research job ID printed by the launcher**:
 
 ```bash

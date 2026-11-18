@@ -16,7 +16,11 @@ from gapslice.certified.risk import nominal_certificate
 
 
 def verify(path,cases=128):
-    shield=Shield(path);b=shield.bounds;rng=np.random.default_rng(90927)
+    with Shield(path) as shield:return _verify(shield,cases)
+
+
+def _verify(shield,cases):
+    b=shield.bounds;rng=np.random.default_rng(90927)
     # Decimal exp at 80 digits is independent of the alternating Taylor code.
     checked=0
     with localcontext() as context:

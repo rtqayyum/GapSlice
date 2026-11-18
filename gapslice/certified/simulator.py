@@ -113,8 +113,11 @@ def repeat_factor(profile,environment):
 
 
 def simulate(profile,policy,environment,seed,episodes,split,tables,model=None,verify_table_hashes=False):
+    if not isinstance(tables,Shield):
+        with Shield(tables,verify_hashes=verify_table_hashes) as shield:
+            return simulate(profile,policy,environment,seed,episodes,split,shield,model)
     profile.check();policy.check();model=Model() if model is None else model
-    shield=tables if isinstance(tables,Shield) else Shield(tables,verify_hashes=verify_table_hashes)
+    shield=tables
     b=shield.bounds
     if (model.control_s!=b.control_s or not math.isclose(model.control_s/model.dt_s,round(model.control_s/model.dt_s))
             or not math.isclose(b.guard_s/model.control_s,round(b.guard_s/model.control_s))

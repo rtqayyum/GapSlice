@@ -1,5 +1,38 @@
 # Redesign verification — 2026-11-18
 
+## HPC startup cleanup fix — after job3098812
+
+The first real HPC smoke job3098812 passed the32 inherited checks and all17
+new functional checks, then failed during TemporaryDirectory teardown with
+ENOTEMPTY. The class fixture still owned three open memory-mapped proof arrays
+when their directory was removed. This is consistent with shared/NFS filesystems
+retaining open, unlinked files; a directory listing/filesystem trace was not
+available to confirm the exact filesystem mechanism. The scientific campaign
+had not started. Research job3098813 remained pending with
+DependencyNeverSatisfied after that smoke failure.
+
+The fix explicitly closes owned mappings before fixture cleanup. Shield now
+supports idempotent close/context management and rejects use after closing;
+verification, worker exit and path-owned simulator calls release mappings on
+normal and exceptional exits. Table builders close their mappings after flush
+and use context-managed hash input streams. No physical parameters, seeds,
+equations or qualification thresholds changed. No cleanup exception is ignored
+and no functional test is skipped. NumPy2.3 exposes no public memmap.close;
+the pinned implementation's backing mmap.close is isolated in one helper,
+with regression checks for the mapping lifetime
+([NumPy documentation](https://numpy.org/doc/2.3/reference/generated/numpy.memmap.html)).
+
+After the fix, **51/51 local launch checks passed**, including two additional
+mapping-lifetime checks. The complete local smoke study
+`cert-smoke-5164b7a4dcf8e06e` finished successfully. All24 raw-result shards and
+their scientific summaries exactly matched the previously verified smoke
+study, including every per-episode vector. Compilation, shell syntax and diff
+checks passed. The shared-filesystem fix still requires the user's new HPC
+smoke run; no successful HPC rerun or research execution is claimed yet.
+
+The evidence below records the earlier local redesign verification, before
+the two resource-lifetime regression tests were added.
+
 ## Executed locally
 
 * **49/49 launch checks passed**: project lock/runtime, inherited feasibility,
