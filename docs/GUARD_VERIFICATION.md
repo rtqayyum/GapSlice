@@ -65,7 +65,24 @@ performance or independent authentication. Export and analyze the frozen pilot
 before updating its HPC checkout; the manifest fingerprints execution scripts
 as well as scientific source.
 
-Unverified: detailed pilot results, multi-node operation, real PHY curves and signaling, measured/testbed data,
+## Export verification and offline analysis
+
+The downloaded pilot export was subsequently inspected locally. All 2,040 task
+identities and episode-vector accounting checks passed, covering 791,808 replays.
+All 76 fingerprinted source/input/execution hashes matched Git snapshot
+`792a97590bf6d6666efb38287317d1d9be4eedea`. Selection/qualification were replayed,
+and all 20 stored method/domain/allocator schedules and risk sums passed the
+offline checks. Every task identified the single compute host `cn002`.
+
+The analyzer produces a self-contained HTML report, JSON aggregates and a
+PNG/SVG figure; source IDs trace back to raw results. Seven dedicated local
+integrity/statistics checks passed. The figure was visually inspected and all
+report artifact links were checked. Raw exports and generated reports remain
+outside Git. The report records both useful component results and limitations;
+it does not claim broad superiority or a completed journal contribution.
+See [the frozen analysis workflow](GUARD_PILOT_ANALYSIS.md).
+
+Unverified: final Slurm walltime, aggregate job memory, multi-node operation, real PHY curves and signaling, measured/testbed data,
 independent backend agreement, a reliable operating-domain classifier,
 application-grounded tolerances, comprehensive grid convergence, continuous-time
 safety or string-stability proofs, novelty beyond the identified prior art and
