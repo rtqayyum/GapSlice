@@ -153,11 +153,36 @@ user-provided successful preflight estimated2026-11-24T18:04:18; this is not a
 reserved start time. At the supplied snapshot, other projects used162 CPUs;
 replacing160 with1280 yields1442 total, below1600. The helper rechecks usage.
 
-Nine mocked scheduler tests cover operation ordering, result preservation,
+Fifteen mocked scheduler tests cover operation ordering, result preservation,
 rejected requests, wrong identities, changed source, quota violations and
-held-job behavior on incomplete cleanup. These are local control-flow tests,
+held-job behavior on incomplete cleanup, plus explicit guard recovery. These are local control-flow tests,
 not a1280-worker performance benchmark. The application has also completed a
 local2-to-4-worker resume with all24 raw shards unchanged.
+
+### Recover the existing held replacement after a stale guard
+
+The actual handover stopped3098836 but its guard remained, so3111745 was
+correctly left held. Use this explicit recovery mode for that exact pair:
+
+```bash
+cd /home/tariq.qayyum/hpc/GapSlice-OJCS &&
+git pull --ff-only origin ojcs-revision-20261117 &&
+/home/tariq.qayyum/hpc/GapSlice-OJCS/.venv/bin/python \
+  /home/tariq.qayyum/hpc/GapSlice-OJCS/scripts/scale_certified.py \
+  --from-job 3098836 --replacement-job 3111745
+```
+
+It verifies the saved handover receipt, unchanged frozen study, replacement
+identity/owner/CPU count and held status. Slurm accounting and the live queue
+must both confirm that the old job ended. A remaining guard must name exactly
+that terminated job; ownership/termination are rechecked before the guard is
+renamed into `outputs/cert/guard-recovery/`. The entire directory and its owner
+record are preserved. The command then releases the **existing** replacement.
+It neither submits nor cancels any job and never edits scientific results.
+An active old job, unexpected guard owner or non-held replacement is rejected.
+This recovery-only helper update also leaves the scientific/execution
+fingerprint unchanged. Local recovery tests pass; actual cluster recovery is
+not claimed until the user runs the command and checks its result.
 
 If smoke job3098812 failed only in temporary proof-table cleanup, pull the
 mapping-lifetime fix before retrying. All17 functional checks passed in that

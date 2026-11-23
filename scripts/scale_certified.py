@@ -2,8 +2,9 @@
 """Queue a held replacement, stop one identified project job, then resume.
 
 This standalone control-plane helper is deliberately outside the frozen
-scientific/execution fingerprint. It never edits source, environments, results
-or project guards. Failed handovers leave the replacement held for inspection.
+scientific/execution fingerprint. It never edits source, environments or
+scientific results. Initial handovers never remove guards; explicit recovery
+can archive a verified terminated owner's guard before releasing a held job.
 """
 import argparse
 from datetime import datetime,timezone
@@ -131,16 +132,59 @@ def handover(project,old,cpus,cpu_limit=1600,wait_seconds=60,poll_seconds=10):
     return replacement
 
 
+def recover(project,old,replacement):
+    """Recover a specific held replacement; never submit or cancel any job."""
+    project=Path(project).resolve();old=str(old);replacement=str(replacement)
+    if not old.isdigit() or not replacement.isdigit() or old==replacement:
+        raise ValueError('Two different numeric job IDs are required')
+    receipt_path=project/'outputs/cert/submissions'/f'scale-{old}-to-{replacement}.json'
+    receipt=json.loads(receipt_path.read_text())
+    if str(receipt.get('old_job'))!=old or str(receipt.get('replacement_job'))!=replacement:
+        raise RuntimeError('Handover receipt does not match the requested job pair')
+    study=verify_study(project,old)
+    if receipt.get('study')!=study:raise RuntimeError('Receipt/frozen study mismatch')
+    info=job_info(replacement)
+    verify_identity(info,replacement,project,getpass.getuser())
+    if (info.get('JobState')!='PENDING' or info.get('Priority')!='0'
+            or int(info.get('NumCPUs','0'))!=receipt.get('cpus')):
+        raise RuntimeError('Replacement is not held/pending with the recorded CPU count; no guard changed')
+    if not old_job_ended(old):raise RuntimeError('Old job is still active or termination is unconfirmed; no guard changed')
+    guard=project/'outputs/ojcs/.campaign.guard';archive=None
+    if guard.is_symlink():raise RuntimeError('Refusing a symlink project guard')
+    owner=guard_owner(project)
+    if owner is not None:
+        if owner!=old:raise RuntimeError(f'Guard owner is {owner}, not terminated job {old}; no guard changed')
+        owner_bytes=(guard/'owner').read_bytes()
+        # Recheck just before the only filesystem mutation. A different guard
+        # or a requeued old job must never be mistaken for a stale owner.
+        if not old_job_ended(old) or (guard/'owner').read_bytes()!=owner_bytes:
+            raise RuntimeError('Job/guard changed during verification; replacement stays held')
+        archive=project/'outputs/cert/guard-recovery'/f'guard-{old}-for-{replacement}-{time.time_ns()}'
+        archive.parent.mkdir(parents=True,exist_ok=True)
+        if archive.exists():raise RuntimeError('Archive path already exists')
+        guard.rename(archive)  # preserve the entire old directory, never delete
+        print(f'Archived terminated job {old} guard: {archive}',flush=True)
+    else:
+        print('Project guard is already clear.',flush=True)
+    command(['scontrol','release',replacement])
+    print(f'Released existing replacement {replacement}; no new job was submitted.\n'
+          f'Frozen study: {study}\nMonitor: bash {project}/hpc/monitor.sh {replacement}',flush=True)
+    return archive
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--project',type=Path,default=Path('/home/tariq.qayyum/hpc/GapSlice-OJCS'))
     parser.add_argument('--from-job',required=True)
+    parser.add_argument('--replacement-job',help='Recover an existing held replacement; archive a verified terminated owner guard')
     parser.add_argument('--cpus',type=int,default=1280)
     parser.add_argument('--cpu-limit',type=int,default=1600)
     parser.add_argument('--wait-seconds',type=int,default=60)
     args=parser.parse_args()
     if args.wait_seconds<0:parser.error('wait-seconds must be nonnegative')
-    try:handover(args.project,args.from_job,args.cpus,args.cpu_limit,args.wait_seconds)
+    try:
+        if args.replacement_job:recover(args.project,args.from_job,args.replacement_job)
+        else:handover(args.project,args.from_job,args.cpus,args.cpu_limit,args.wait_seconds)
     except (RuntimeError,ValueError,OSError,subprocess.CalledProcessError) as error:
         detail=getattr(error,'stderr',None) or str(error)
         print(f'ERROR: {detail}',file=sys.stderr);return 1

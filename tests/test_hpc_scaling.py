@@ -29,13 +29,17 @@ class ScalingTests(unittest.TestCase):
         self.events.append(args)
         if args[:3]==['scontrol','show','job']:
             project='/another/project' if 'wrong_project' in self.flags else str(self.project)
+            if args[3]=='3112000':
+                state='RUNNING' if 'replacement_running' in self.flags else 'PENDING'
+                return (f'JobId=3112000 JobName=gs_cert_research WorkDir={project} '
+                        f'UserId=tariq.qayyum(1) JobState={state} Priority=0 NumCPUs=1280')
             return (f'JobId=3098836 JobName=gs_cert_research WorkDir={project} '
                     'UserId=tariq.qayyum(1) JobState=RUNNING NumCPUs=160')
         if args[:3]==['scontrol','show','partition']:return 'PartitionName=longq MaxTime=20-00:00:00'
         if args[0]=='squeue':
             if '-u' in args:return '96\n160\n24\n24\n4\n4\n4\n4\n2'
             return 'COMPLETING' if 'slow_cleanup' in self.flags else ''
-        if args[0]=='sacct':return '3098836|CANCELLED by 1|'
+        if args[0]=='sacct':return '3098836|RUNNING|' if 'old_running' in self.flags else '3098836|CANCELLED by 1|'
         if args[0]=='sbatch':
             if '--test-only' in args:
                 if 'reject_preflight' in self.flags:raise subprocess.CalledProcessError(1,args,stderr='account limit')
@@ -56,6 +60,12 @@ class ScalingTests(unittest.TestCase):
     def cancelled(self):return [x for x in self.events if x[0]=='scancel']
 
     def released(self):return [x for x in self.events if x[:2]==['scontrol','release']]
+
+    def recovery_receipt(self):
+        p=self.project/'outputs/cert/submissions/scale-3098836-to-3112000.json'
+        p.parent.mkdir(parents=True,exist_ok=True)
+        p.write_text(json.dumps(dict(old_job='3098836',replacement_job='3112000',study='frozen-study',cpus=1280)))
+        return p
 
     def test_submit_held_before_cancel_then_release_preserves_results(self):
         self.assertEqual(self.run_handover(),'3112000')
@@ -111,6 +121,40 @@ class ScalingTests(unittest.TestCase):
         self.flags.add('slow_cleanup')
         with self.assertRaisesRegex(RuntimeError,'remains HELD'):self.run_handover()
         self.assertFalse(self.released())
+
+    def test_explicit_recovery_archives_old_guard_and_releases_existing_job(self):
+        self.recovery_receipt();before=(self.guard/'owner').read_bytes()
+        archive=scale.recover(self.project,'3098836','3112000')
+        self.assertFalse(self.guard.exists());self.assertEqual((archive/'owner').read_bytes(),before)
+        self.assertEqual(self.released(),[['scontrol','release','3112000']])
+        self.assertFalse(self.cancelled());self.assertFalse(any(x[0]=='sbatch' for x in self.events))
+        self.assertEqual(self.raw.read_bytes(),b'completed scientific result')
+
+    def test_recovery_refuses_active_old_job(self):
+        self.recovery_receipt();self.flags.add('old_running')
+        with self.assertRaisesRegex(RuntimeError,'still active'):scale.recover(self.project,'3098836','3112000')
+        self.assertTrue(self.guard.exists());self.assertFalse(self.released())
+
+    def test_recovery_refuses_a_different_guard_owner(self):
+        self.recovery_receipt();(self.guard/'owner').write_text('job_id=999\n')
+        with self.assertRaisesRegex(RuntimeError,'Guard owner'):scale.recover(self.project,'3098836','3112000')
+        self.assertTrue(self.guard.exists());self.assertFalse(self.released())
+
+    def test_recovery_refuses_running_replacement(self):
+        self.recovery_receipt();self.flags.add('replacement_running')
+        with self.assertRaisesRegex(RuntimeError,'not held'):scale.recover(self.project,'3098836','3112000')
+        self.assertTrue(self.guard.exists());self.assertFalse(self.released())
+
+    def test_recovery_also_works_after_delayed_guard_cleanup(self):
+        self.recovery_receipt();(self.guard/'owner').unlink();self.guard.rmdir()
+        self.assertIsNone(scale.recover(self.project,'3098836','3112000'))
+        self.assertEqual(self.released(),[['scontrol','release','3112000']])
+
+    def test_recovery_refuses_mismatched_receipt(self):
+        p=self.recovery_receipt();record=json.loads(p.read_text());record['study']='different-study'
+        p.write_text(json.dumps(record))
+        with self.assertRaisesRegex(RuntimeError,'mismatch'):scale.recover(self.project,'3098836','3112000')
+        self.assertTrue(self.guard.exists());self.assertFalse(self.released())
 
 
 if __name__=='__main__':unittest.main()
