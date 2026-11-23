@@ -112,6 +112,53 @@ resubmission loop. Partial results survive timeouts and failures.
 
 ## Monitor and recover
 
+### Resume a running study with more CPUs
+
+The standalone `scripts/scale_certified.py` helper stages a replacement before
+interrupting the old computation. Adding this helper, its `test_hpc_scaling.py`
+tests and documentation does not change the frozen scientific/execution
+fingerprint. That equality is checked locally before this update is published;
+the helper also verifies the actual HPC study's source/runtime before cancelling.
+No source, dependency, scientific protocol or completed result is modified.
+
+For the current job, after the successful1280-CPU scheduler preflight:
+
+```bash
+cd /home/tariq.qayyum/hpc/GapSlice-OJCS &&
+git pull --ff-only origin ojcs-revision-20261117 &&
+/home/tariq.qayyum/hpc/GapSlice-OJCS/.venv/bin/python \
+  /home/tariq.qayyum/hpc/GapSlice-OJCS/scripts/scale_certified.py \
+  --from-job 3098836 --cpus 1280
+```
+
+The helper verifies the old job's exact ID, owner, job name, project directory,
+study signature and guard ownership. It checks the projected running CPU count
+against1600 and queries longq's current maximum time. It submits the replacement
+**held**, with `afterany:3098836`, then records its ID under
+`outputs/cert/submissions/scale-3098836-to-NEW_JOB.json`. Only after successful
+submission does it cancel **3098836**, using `scancel --full` so the batch shell
+can handle its cleanup trap. It waits up to60 seconds for termination/accounting
+and requires the project guard to be absent before releasing the held job.
+
+Preflight/submission/source/identity failures leave the old computation running.
+If termination is slow or a guard remains, the replacement stays held; the
+helper reports its ID and does **not** remove the guard. Inspect the output
+before manually releasing anything. Other projects' jobs are never cancelled.
+Completed result shards are verified and reused; interrupted shards repeat.
+The resumed study uses the new worker count without changing its random seeds.
+
+The current4GiB/CPU setting requests5TiB for1280 CPUs. The CPU count is a
+request, not a guarantee of immediate allocation or linear speedup. The
+user-provided successful preflight estimated2026-11-24T18:04:18; this is not a
+reserved start time. At the supplied snapshot, other projects used162 CPUs;
+replacing160 with1280 yields1442 total, below1600. The helper rechecks usage.
+
+Nine mocked scheduler tests cover operation ordering, result preservation,
+rejected requests, wrong identities, changed source, quota violations and
+held-job behavior on incomplete cleanup. These are local control-flow tests,
+not a1280-worker performance benchmark. The application has also completed a
+local2-to-4-worker resume with all24 raw shards unchanged.
+
 If smoke job3098812 failed only in temporary proof-table cleanup, pull the
 mapping-lifetime fix before retrying. All17 functional checks passed in that
 attempt; the simulation campaign had not started. Job3098813 belongs to this
