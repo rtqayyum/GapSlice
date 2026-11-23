@@ -380,6 +380,43 @@ Neither check establishes successful cluster operation or research results
 at 768 ranks. The effective adapter is an operational recovery, not a new
 scientific method or strengthened theorem.
 
+## Read-only progress and sampled ETA
+
+Use `scripts/certified_progress.py` for a compact status snapshot without
+enumerating every raw-result file:
+
+```bash
+/home/tariq.qayyum/hpc/GapSlice-OJCS/.venv/bin/python \
+  /home/tariq.qayyum/hpc/GapSlice-OJCS/scripts/certified_progress.py \
+  --job 3111761 --sample 60
+```
+
+It prints live/accounting state (including failure exit codes and allocated
+nodes), batch/probe/failure status when present, main-log tails, deduplicated
+logged completions across all attempts, and fresh/reused counts for this job.
+It reads the small frozen protocol prefix and selection to obtain the exact
+calibration/test totals; it does not load the full candidate bank or import
+the simulator. Logged completion is progress evidence, not a replacement for
+the pipeline's required raw-data checksums and final validation.
+
+For a RUNNING job, it takes a second sample after 60 seconds and estimates
+remaining main-replay time from **new COMPLETE task IDs only**. RESUME events
+and worker processed counters never inflate this rate. At least ten fresh
+main-task completions and a 30-second observation window are required. A failed
+or unconfirmed job, unresolved task failure, or insufficient progress produces
+no numerical ETA. `--sample 300` uses a longer window; `--sample 0` skips sampling.
+The snapshot prints immediately before waiting. A short-window extrapolation
+assumes future throughput is similar and does not include diagnostics, result
+revalidation, allocation or report generation; stragglers can extend it.
+
+The helper writes no files, changes no jobs and uses no simulator workers.
+It is outside the frozen source/execution fingerprint, as are its
+`tests/test_hpc_progress.py` checks. Installing only this helper/tests/documentation
+commit while the snapshotted runtime is active leaves its source/runtime
+identity unchanged. Five local tests cover cross-attempt deduplication,
+reused/fresh accounting, partial log lines, ETA arithmetic and failed-job
+reporting. HPC progress or an ETA is not claimed until the command is run there.
+
 ## Results and transfer
 
 For a completed job:
