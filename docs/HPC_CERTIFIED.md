@@ -247,6 +247,139 @@ Source/runtime/protocol changes create a new immutable study ID; they cannot
 silently reuse old scientific results. Do not pull or edit source during a run.
 Revising after held-out inspection requires a fresh final namespace and review.
 
+## Recovery from the 768-rank launch failure (job 3111745)
+
+The supplied logs show two failures: Slurm could not connect task I/O for
+ranks 30–90, and rank 475 on cn171 raised `FileNotFoundError` when renaming
+an optional worker telemetry file. Slurm then terminated the worker step.
+The base driver subsequently scanned cached results, leaving the batch job
+apparently running without simulation workers. The soft/hard open-file limits
+were both 131072. These observations do not establish the underlying network
+or filesystem cause; they do not demonstrate a corrupt scientific result.
+The user has issued `scancel --full --quiet 3111745`.
+
+Use the recorded runtime adapter for this stopped study:
+
+```bash
+module load slurm
+cd /home/tariq.qayyum/hpc/GapSlice-OJCS &&
+git pull --ff-only origin ojcs-revision-20261117 &&
+/home/tariq.qayyum/hpc/GapSlice-OJCS/.venv/bin/python \
+  /home/tariq.qayyum/hpc/GapSlice-OJCS/scripts/certified_runtime.py submit \
+  --from-job 3111745 --cpus 768 --per-node 64
+```
+
+This checks the old job has ended in both accounting and the live queue,
+verifies its owner/name, mapping and frozen source/runtime, checks the actual
+`limit` QoS CPU allowance and current user CPU usage, and runs `sbatch --test-only`.
+It then submits one HELD job and records a receipt. Only a guard owned by the
+verified terminated old job can be archived before the new job is released.
+No job is canceled. A different or live guard owner is rejected. If cleanup is
+not yet complete, wait for Slurm to finish it and rerun; there is no new job
+until these checks pass. If the tool prints a HELD replacement ID before an
+error, use its printed recovery command instead of submitting another job.
+
+The scheduler request is 12 nodes, 64 single-CPU ranks per node, 768 CPUs,
+4 GiB/CPU (3 TiB total), the queried maximum `longq` walltime (currently
+20 days), and no GPU. The actual QoS limit observed on this cluster is
+**1000 CPUs/user**, not the originally stated 1600. With 162 other running
+CPUs the projected total is 930. The tool recomputes this at submission;
+other pending jobs can still affect scheduling. Exactly 12 fully available
+64-CPU nodes may queue differently from the previous scattered allocation.
+There is no promised queue start time or measured 768-CPU speedup yet.
+
+Before any simulation, a five-minute Slurm step tests all 768 ranks, the same
+compact placement and per-worker stdout/stderr routing, and shared-filesystem
+write/fsync/rename/read. Every rank and host/local-rank count must be present.
+Probe failure exits nonzero before scientific work; inspect its logs rather
+than retrying a multi-day run blindly. A successful probe is a point-in-time
+check and cannot guarantee the network/filesystem will stay healthy.
+
+The adapter also:
+
+- Retries optional worker telemetry writes three times. If all retries fail,
+  it logs a warning and continues. Scientific result JSON/NPZ writes, checksums,
+  task failures, manifests, qualification and report commits remain required.
+- Exits immediately on a failed `srun` step, before scanning hundreds of
+  thousands of cached records. Successfully committed results remain available.
+- Avoids relaunching a completed design/calibration/test stage when its existing
+  successful summary matches. Before any subsequent scientific use, the original
+  aggregator revalidates every task identity and raw NPZ digest. Missing/altered
+  results fail the job. Nothing is accepted solely from the summary.
+- Prefetches original result validation with eight bounded I/O threads in the
+  coordinator. The original aggregator performs its original additions in
+  manifest order; scientific reductions, selection rules and RNG streams do not
+  change. Worker task assignment remains the original rank-independent striding.
+
+`scripts/certified_runtime.py` is deliberately outside the base source hash.
+**This is a changed execution adapter**, recorded separately rather than hidden
+behind the original fingerprint. Submission snapshots its full source, a
+generated effective Batch and a spec with their SHA-256 hashes under
+`outputs/cert/runtime/OLD_JOB-TIMESTAMP/`. The generated Batch changes only the
+certified dispatch to the snapshotted adapter; the tracked `Batch`, all
+`gapslice/` code, frozen tests and proof document remain byte-identical. The
+adapter checks the original source/runtime and frozen study in coordinator and
+workers. Do not edit or pull again while it runs.
+
+New job IDs, resources, base fingerprint, adapter hash, effective Batch hash,
+probe and stage outcomes are linked under:
+
+```text
+outputs/cert/submissions/scale-3111745-to-NEW_JOB.json
+outputs/cert/studies/cert-research-16130d0ca159e816/runtime/NEW_JOB/provenance.json
+outputs/cert/studies/cert-research-16130d0ca159e816/runtime/NEW_JOB/probe.json
+outputs/cert/studies/cert-research-16130d0ca159e816/runtime/NEW_JOB/probe/probe_RANK.err
+outputs/cert/studies/cert-research-16130d0ca159e816/runtime/NEW_JOB/failure.json
+```
+
+`failure.json` exists only if a launch/worker failure was recorded. Other errors
+are also recorded in `provenance.json` and the main job `.err`. Probe records
+are operational checks, not scientific experiment results. On success, transfer
+both `analysis_bundle.tar.gz` and `runtime/NEW_JOB/runtime_bundle.tar.gz` for
+complete scientific and changed-execution provenance. The latter contains the
+exact adapter, effective Batch, spec, provenance and successful probe summary.
+
+Monitor with the NEW_JOB ID printed by the command:
+
+```bash
+squeue -j NEW_JOB -o '%.18i %.24j %.10T %.8C %.14M %.14L %R'
+sacct -j NEW_JOB --format=JobID,JobName%24,State,ExitCode,Elapsed,TotalCPU,AllocCPUS,MaxRSS
+sstat -j NEW_JOB --allsteps --format=JobID,NTasks,AveCPU,AveRSS,MaxRSS,MaxVMSize
+tail -n 80 /home/tariq.qayyum/hpc/GapSlice-OJCS/logs/gs_cert_research_NEW_JOB.out \
+  /home/tariq.qayyum/hpc/GapSlice-OJCS/logs/gs_cert_research_NEW_JOB.err
+```
+
+Expect `PROBE PASSED ranks=768 hosts=12`, then completed-design reuse and
+`REVALIDATE stage=design` progress before calibration starts. This revalidation
+is I/O work and can take time without busy simulation ranks. The original
+`monitor.sh` can be slow because it enumerates all existing results; use the
+main log for quick checks during launch/revalidation. Optional telemetry can be
+missing, so raw committed results determine completion. Count **fresh COMPLETE
+events**, excluding RESUME, over two snapshots to estimate throughput after
+calibration starts; processed telemetry includes reused work and is unsuitable
+as a fresh-work rate. No ETA is measured before fresh work is observed.
+
+If a new job later fails/time-limits, preserve its ID and use this adapter's
+`submit --from-job NEW_JOB --cpus 768 --per-node 64` after termination. It resumes
+the same study and archives only that terminated job's guard if necessary.
+If Slurm I/O errors repeat during the probe, send the job ID, affected hosts
+and rank logs to cluster support. Node exclusions are available only as an
+explicit optional `--exclude cnNNN,cnMMM`; the software does not infer a faulty
+node or change scientific tasks to make a launch pass.
+
+Local verification on 23 November 2026 passed 16 adapter tests and 66 existing
+launch/scaling/scientific tests. The Slurm submission tests use mocks only.
+A freshly computed synthetic smoke run completed 24 tasks / 112 episodes;
+all scientific task summaries and all 150 stored vectors exactly matched the
+unchanged original pipeline. A second local pass changed the rank count from
+two to four and preserved the hashes and modification times of all 48 result
+JSON/NPZ files. Bash syntax, Python compilation and the original base source /
+execution fingerprint checks passed. The only subsequent adapter changes
+affected submission logging and canonical-path checking, not the pipeline.
+Neither check establishes successful cluster operation or research results
+at 768 ranks. The effective adapter is an operational recovery, not a new
+scientific method or strengthened theorem.
+
 ## Results and transfer
 
 For a completed job:
