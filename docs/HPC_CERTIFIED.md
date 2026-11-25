@@ -247,6 +247,75 @@ Source/runtime/protocol changes create a new immutable study ID; they cannot
 silently reuse old scientific results. Do not pull or edit source during a run.
 Revising after held-out inspection requires a fresh final namespace and review.
 
+## Unequal worker completion: runtime v2 and job 3111761
+
+On 25 November the user supplied evidence that job 3111761 had ended during
+calibration after 21:28:23 wall time. The initial 768-rank I/O probe passed,
+the design stage was revalidated, and 74,210 new calibration shards completed.
+Logged calibration completion is 161,520/173,904 (92.9%); 12,384 calibration
+shards and all 173,904 test shards remain. These progress counts are not a
+replacement for validating retained JSON identities and raw-data checksums.
+
+**A launcher bug was identified in runtime v1:** its `srun --wait=30` terminates
+unfinished peers 30 seconds after the first rank exits, even successfully.
+That is inappropriate for independent shards with unequal runtimes. The
+[Slurm 23.02.8 manual](https://github.com/SchedMD/slurm/blob/slurm-23-02-8-1/doc/man/man1/srun.1)
+documents that `--wait=0` permits unlimited waiting and that
+`--kill-on-bad-exit=1` still terminates the step on a nonzero rank exit. Simply
+omitting `--wait` could inherit a finite cluster WaitTime, so v2 sets zero
+explicitly for both the launch probe and scientific worker steps. The Slurm
+step/job walltime limits remain enforced.
+
+The bug is definite and fits the observed pattern of zero logged FAILED tasks
+followed by killed workers / srun exit 137. The provided log tail does not
+prove it was the initiating event: inspect the first main-error lines for
+the first-task-exit/termination message, OOM, node failure or a separate error.
+Exit 137 alone does not establish out-of-memory. Preserve all old logs and
+runtime snapshots; do not edit the old v1 adapter/spec in place.
+
+Runtime **version 2** snapshots the corrected adapter separately. Its initial
+probe includes deliberate unequal completion: rank zero and most ranks exit
+promptly, while one rank per node sleeps at least 40 seconds before committing
+its success record. All ranks, delayed-rank elapsed times and host placement
+must validate. On the standard 12 x 64 request this exercises twelve late
+ranks, beyond the erroneous 30-second cutoff, before any simulation starts.
+The probe still has a five-minute Slurm step limit. This is a native Slurm
+check on the cluster, separate from local mocked tests.
+
+Pull the fix and resume only from the identified, terminated project job:
+
+```bash
+module load slurm
+head -n 40 /home/tariq.qayyum/hpc/GapSlice-OJCS/logs/gs_cert_research_3111761.err
+cd /home/tariq.qayyum/hpc/GapSlice-OJCS &&
+git pull --ff-only origin ojcs-revision-20261117 &&
+/home/tariq.qayyum/hpc/GapSlice-OJCS/.venv/bin/python \
+  /home/tariq.qayyum/hpc/GapSlice-OJCS/scripts/certified_runtime.py submit \
+  --from-job 3111761 --cpus 768 --per-node 64 --exclude cn164,cn171
+```
+
+The launcher checks the current QoS budget, verifies the old job has ended,
+and checks ownership, frozen source/runtime and study identity. It submits one
+held job, records its v2 provenance, recovers only that terminated job's guard
+if needed and releases the replacement. It does not cancel any job. Already
+committed scientific results are reused after their original validation;
+unfinished shards resume under unchanged task IDs, seeds and microbatches.
+The 768 CPU / 12-node / 4 GiB-per-CPU / maximum-longq-time / no-GPU request is
+unchanged. Retain the two node exclusions as the previous I/O workaround;
+they are separate from this launcher fix.
+
+Expect `PROBE PASSED ranks=768 hosts=12 delayed_ranks=12 delay_s=40`, followed
+by design revalidation and resumed calibration. Follow the new printed job ID
+with `scripts/certified_progress.py --job NEW_JOB --sample 300`. A numerical
+ETA is meaningful again after the new job produces fresh completions. The
+old five-minute ETA is not an active-job forecast while the run is stopped.
+
+The corrected wait argument, late-rank timing/coverage and genuine-error
+shutdown are tested locally. Native 768-rank execution of v2 remains
+unverified until the user runs the command. All changes are outside the
+frozen base scientific/execution fingerprint; the simulation, aggregation,
+proof text, tracked Batch and original hpc shell scripts remain unchanged.
+
 ## Recovery from the 768-rank launch failure (job 3111745)
 
 The supplied logs show two failures: Slurm could not connect task I/O for
@@ -290,7 +359,9 @@ There is no promised queue start time or measured 768-CPU speedup yet.
 
 Before any simulation, a five-minute Slurm step tests all 768 ranks, the same
 compact placement and per-worker stdout/stderr routing, and shared-filesystem
-write/fsync/rename/read. Every rank and host/local-rank count must be present.
+write/fsync/rename/read. Runtime v2 also requires deliberately late ranks to
+survive for at least 40 seconds after the early ranks can exit successfully.
+Every rank and host/local-rank count must be present.
 Probe failure exits nonzero before scientific work; inspect its logs rather
 than retrying a multi-day run blindly. A successful probe is a point-in-time
 check and cannot guarantee the network/filesystem will stay healthy.

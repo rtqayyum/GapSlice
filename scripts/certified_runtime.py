@@ -24,7 +24,7 @@ import time
 import uuid
 
 
-VERSION = 1
+VERSION = 2
 DEFAULT_PROJECT = Path('/home/tariq.qayyum/hpc/GapSlice-OJCS')
 DISPATCH = '"$PY" -m gapslice.certified.campaign run --preset "$PRESET" --workers "$SLURM_NTASKS"'
 
@@ -104,6 +104,8 @@ def load_spec(path):
         raise RuntimeError('Runtime adapter or effective Batch hash mismatch')
     if geometry(spec['cpus'], spec['per_node']) != spec['nodes']:
         raise RuntimeError('Invalid recorded worker geometry')
+    if spec.get('probe_slow_delay_s', 0) <= 30:
+        raise RuntimeError('Uneven-completion probe must exceed the former 30-second cutoff')
     return spec
 
 
@@ -151,9 +153,10 @@ def submit(project, old, cpus=768, per_node=64, exclude=''):
                 adapter=str(runner), adapter_sha256=digest(runner), batch=str(batch),
                 batch_sha256=digest(batch), base_batch_sha256=digest(project / 'Batch'),
                 base_source=c.source(), created_utc=utc(), cpu_usage_at_submission=used,
-                qos_cpu_limit=limit, metadata_prefetch_threads=8,
+                qos_cpu_limit=limit, metadata_prefetch_threads=8, probe_slow_delay_s=40,
                 changes=['compact placement', 'full geometry I/O probe',
                          'optional heartbeat retries', 'fail fast on srun error',
+                         'unlimited successful-peer wait; 40-second uneven completion probe',
                          'ordered hash-validated result prefetch; unchanged arithmetic'])
     write_json(spec_path, spec)
     subprocess.run(['bash', '-n', str(batch)], check=True)
@@ -292,20 +295,35 @@ def ordered_aggregate(c, original, path, threads=8):
 def step_args(spec, log, name, timeout=None):
     args = ['srun', f'--nodes={spec["nodes"]}', f'--ntasks={spec["cpus"]}',
             f'--ntasks-per-node={spec["per_node"]}', '--distribution=block:block',
-            '--cpus-per-task=1', '--kill-on-bad-exit=1', '--wait=30',
+            # --wait starts after ANY first task exit, including success.
+            # Independent workers must be allowed to finish at different times.
+            # Zero overrides cluster WaitTime/environment defaults. Genuine
+            # failures still stop the step via --kill-on-bad-exit=1.
+            '--cpus-per-task=1', '--kill-on-bad-exit=1', '--wait=0',
             f'--output={log}/{name}_%t.out', f'--error={log}/{name}_%t.err']
     if timeout:
         args.append(f'--time={timeout}')
     return args
 
 
+def probe_delay(spec, rank):
+    # Rank zero finishes promptly. One rank per host remains alive longer
+    # than the former 30-second peer-exit cutoff, before committing its record.
+    return spec['probe_slow_delay_s'] if rank and (rank + 1) % spec['per_node'] == 0 else 0
+
+
 def probe(spec, directory):
-    """Use the SAME rank count, placement and stdout/stderr routing as science."""
+    """Use science geometry/I/O and exercise uneven successful rank completion."""
     rank, size = int(os.environ['SLURM_PROCID']), int(os.environ['SLURM_NTASKS'])
     if size != spec['cpus'] or not 0 <= rank < size:
         raise RuntimeError('Probe rank/count mismatch')
+    delay = probe_delay(spec, rank)
+    started = time.monotonic()
+    if delay:
+        time.sleep(delay)
     record = dict(rank=rank, size=size, host=socket.gethostname(), pid=os.getpid(),
-                  local_rank=int(os.environ['SLURM_LOCALID']), utc=utc())
+                  local_rank=int(os.environ['SLURM_LOCALID']), utc=utc(),
+                  planned_delay_s=delay, elapsed_delay_s=time.monotonic() - started)
     path = Path(directory) / f'{rank:04d}.json'
     write_json(path, record)
     if json.loads(path.read_text()) != record:
@@ -325,7 +343,14 @@ def validate_probe(directory, spec):
     for host in hosts:
         if {x['local_rank'] for x in rows if x['host'] == host} != set(range(spec['per_node'])):
             raise RuntimeError('Probe local rank coverage mismatch')
-    return dict(ranks=len(rows), hosts=dict(hosts), passed=True, utc=utc())
+    delayed = 0
+    for row in rows:
+        required = probe_delay(spec, row['rank'])
+        if row.get('planned_delay_s') != required or row.get('elapsed_delay_s', -1) < required - .1:
+            raise RuntimeError('Uneven-completion probe delay was not satisfied')
+        delayed += bool(required)
+    return dict(ranks=len(rows), hosts=dict(hosts), passed=True, delayed_ranks=delayed,
+                required_delay_s=spec['probe_slow_delay_s'], successful_peer_wait_s=0, utc=utc())
 
 
 def run_probe(spec, spec_path, runtime):
@@ -333,14 +358,16 @@ def run_probe(spec, spec_path, runtime):
     log.mkdir(parents=True, exist_ok=True)
     args = step_args(spec, log, 'probe', '00:05:00') + [sys.executable, spec['adapter'],
            'probe', '--spec', str(spec_path), '--directory', str(log / 'records')]
-    print(f'PROBE starting {spec["cpus"]} ranks on {spec["nodes"]} nodes', flush=True)
+    print(f'PROBE starting {spec["cpus"]} ranks on {spec["nodes"]} nodes; '
+          f'late ranks delay {spec["probe_slow_delay_s"]}s; successful-peer wait unlimited', flush=True)
     code = subprocess.run(args, check=False).returncode
     if code:
         write_json(runtime / 'failure.json', dict(phase='probe', exit_code=code, utc=utc(), command=args))
         raise RuntimeError(f'Launch/I/O probe failed (srun={code}); no scientific work started. Logs: {log}')
     result = validate_probe(log / 'records', spec)
     write_json(runtime / 'probe.json', result)
-    print(f'PROBE PASSED ranks={result["ranks"]} hosts={len(result["hosts"])}', flush=True)
+    print(f'PROBE PASSED ranks={result["ranks"]} hosts={len(result["hosts"])} '
+          f'delayed_ranks={result["delayed_ranks"]} delay_s={result["required_delay_s"]}', flush=True)
 
 
 def execute(c, spec, spec_path, runtime, path, tables, workers, local):

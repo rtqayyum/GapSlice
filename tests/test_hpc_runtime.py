@@ -27,6 +27,7 @@ class RuntimeTests(unittest.TestCase):
         self.path = self.base / 'design/manifest.json'
         self.path.parent.mkdir()
         self.settings = dict(cpus=4, nodes=2, per_node=2, metadata_prefetch_threads=2,
+                             probe_slow_delay_s=40,
                              adapter=str(ROOT / 'scripts/certified_runtime.py'))
 
     def test_budget_uses_actual_qos_not_claimed_1600(self):
@@ -49,6 +50,16 @@ class RuntimeTests(unittest.TestCase):
         for flag in ['--nodes=12', '--ntasks=768', '--ntasks-per-node=64', '--distribution=block:block', '--kill-on-bad-exit=1']:
             self.assertIn(flag, flags)
         self.assertFalse(any('gpu' in arg or 'gres' in arg for arg in flags))
+
+    def test_successful_early_rank_never_starts_peer_kill_countdown(self):
+        # Independent shards finish at different times. Slurm --wait starts
+        # on a zero-status exit too: removing the flag would inherit WaitTime.
+        for name, timeout in [('worker', None), ('probe', '00:05:00')]:
+            with self.subTest(name=name):
+                flags = runtime.step_args(self.settings, self.base, name, timeout)
+                self.assertEqual([x for x in flags if x.startswith('--wait=')], ['--wait=0'])
+                self.assertIn('--kill-on-bad-exit=1', flags)
+        self.assertIn('--time=00:05:00', flags)
 
     def test_transient_heartbeat_rename_is_retried(self):
         writer = Mock(side_effect=[FileNotFoundError('lost temp'), None])
@@ -148,14 +159,50 @@ class RuntimeTests(unittest.TestCase):
     def test_probe_requires_every_rank_and_compact_host_coverage(self):
         records = self.base / 'records'
         for rank in range(4):
+            delay = runtime.probe_delay(self.settings, rank)
             runtime.write_json(records / f'{rank:04d}.json',
-                               dict(rank=rank, size=4, local_rank=rank % 2, host=f'cn{rank // 2}'))
+                               dict(rank=rank, size=4, local_rank=rank % 2, host=f'cn{rank // 2}',
+                                    planned_delay_s=delay, elapsed_delay_s=delay))
         self.assertTrue(runtime.validate_probe(records, self.settings)['passed'])
         runtime.write_json(records / '0003.json', dict(rank=3, size=4, local_rank=0, host='cn4'))
         with self.assertRaisesRegex(RuntimeError, 'not compact'):
             runtime.validate_probe(records, self.settings)
         (records / '0003.json').unlink()
         with self.assertRaises(FileNotFoundError):
+            runtime.validate_probe(records, self.settings)
+
+    def test_probe_exercises_delayed_rank_without_waiting_locally(self):
+        # The real HPC probe sleeps 40s, beyond the erroneous 30s cutoff.
+        # Local checks inject time; they are not a native Slurm run.
+        records = self.base / 'probe'
+        with patch.dict(os.environ, SLURM_PROCID='3', SLURM_NTASKS='4', SLURM_LOCALID='1'), patch.object(
+                runtime.time, 'monotonic', side_effect=[100., 140.1]), patch.object(runtime.time, 'sleep') as sleep:
+            runtime.probe(self.settings, records)
+        sleep.assert_called_once_with(40)
+        row = json.loads((records / '0003.json').read_text())
+        self.assertEqual(row['planned_delay_s'], 40)
+        self.assertGreaterEqual(row['elapsed_delay_s'], 40)
+        with patch.dict(os.environ, SLURM_PROCID='0', SLURM_NTASKS='4', SLURM_LOCALID='0'), patch.object(
+                runtime.time, 'sleep') as sleep:
+            runtime.probe(self.settings, records)
+        sleep.assert_not_called()
+        self.assertEqual(json.loads((records / '0000.json').read_text())['planned_delay_s'], 0)
+
+    def test_probe_cannot_pass_if_a_late_rank_did_not_survive_the_delay(self):
+        records = self.base / 'probe'
+        for rank in range(4):
+            delay = runtime.probe_delay(self.settings, rank)
+            runtime.write_json(records / f'{rank:04d}.json',
+                               dict(rank=rank, size=4, local_rank=rank % 2, host=f'cn{rank // 2}',
+                                    planned_delay_s=delay, elapsed_delay_s=delay))
+        result = runtime.validate_probe(records, self.settings)
+        self.assertEqual(result['delayed_ranks'], 2)
+        self.assertEqual(result['required_delay_s'], 40)
+        path = records / '0003.json'
+        row = json.loads(path.read_text())
+        row['elapsed_delay_s'] = 30
+        runtime.write_json(path, row)
+        with self.assertRaisesRegex(RuntimeError, 'delay was not satisfied'):
             runtime.validate_probe(records, self.settings)
 
     def test_failed_probe_never_enters_scientific_pipeline(self):
@@ -255,6 +302,8 @@ class SubmissionTests(unittest.TestCase):
         self.assertEqual(s['adapter_sha256'], runtime.digest(s['adapter']))
         self.assertEqual(s['batch_sha256'], runtime.digest(s['batch']))
         self.assertEqual(s['base_source'], {'source': 'frozen'})
+        self.assertEqual(s['version'], 2)
+        self.assertEqual(s['probe_slow_delay_s'], 40)
         self.h.recover.assert_called_once_with(self.project, '3111745', '3112000')
 
     def test_active_old_job_or_over_quota_request_never_submits(self):
