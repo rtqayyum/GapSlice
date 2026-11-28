@@ -1,0 +1,49 @@
+#!/bin/bash -l
+# Resource geometry and maximum queue runtime are supplied by contractlab.hpc.
+#SBATCH --job-name=gs_contract_research
+#SBATCH --partition=longq
+#SBATCH --nodes=15
+#SBATCH --ntasks=480
+#SBATCH --ntasks-per-node=32
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=4G
+#SBATCH --time=20-00:00:00
+#SBATCH --output=/home/tariq.qayyum/hpc/GapSlice-OJCS/logs/%x_%j.out
+#SBATCH --error=/home/tariq.qayyum/hpc/GapSlice-OJCS/logs/%x_%j.err
+set -euo pipefail
+ulimit -c 0
+PROJECT=/home/tariq.qayyum/hpc/GapSlice-OJCS
+cd "$PROJECT"
+export GS_OJCS_PROJECT="$PROJECT"
+source "$PROJECT/hpc/environment.sh"
+source "$PROJECT/hpc/project_lock.sh"
+mkdir -p "$PROJECT/logs" "$PROJECT/results" "$PROJECT/outputs" "$PROJECT/figures"
+PHASE=setup
+finish() {
+  local code=$?
+  trap - EXIT
+  if ! gs_release_project_lock; then code=74; fi
+  mkdir -p "$PROJECT/outputs/contracts/jobs"
+  printf '{"exit_code":%s,"phase":"%s"}\n' "$code" "$PHASE" > "$PROJECT/outputs/contracts/jobs/${SLURM_JOB_ID}.status.json"
+  exit "$code"
+}
+trap finish EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
+gs_acquire_project_lock "$PROJECT"
+printf 'Acquired contract project guard for job %s.\n' "$SLURM_JOB_ID"
+type module >/dev/null 2>&1 && module load anaconda3
+PY="$PROJECT/.venv-contract/bin/python"
+PRESET="${GS_CONTRACT_PRESET:-research}"
+PHASE=runtime_verification
+"$PY" -m contractlab.hpc check --preset "$PRESET"
+PHASE=uneven_completion_probe
+mkdir -p "$PROJECT/logs/contracts/probe-$SLURM_JOB_ID"
+srun --ntasks="$SLURM_NTASKS" --cpus-per-task=1 --distribution=block:block \
+  --wait=0 --kill-on-bad-exit=1 \
+  --output="$PROJECT/logs/contracts/probe-$SLURM_JOB_ID/rank-%t.out" \
+  --error="$PROJECT/logs/contracts/probe-$SLURM_JOB_ID/rank-%t.err" \
+  "$PY" -m contractlab.hpc probe
+PHASE=contract_pipeline
+"$PY" -m contractlab.campaign run --preset "$PRESET" --workers "$SLURM_NTASKS"
+PHASE=finished

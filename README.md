@@ -1,5 +1,14 @@
 # GapSlice
 
+> **Contract framework revision (2026-11-28):** new controller-agnostic
+> qualification, fine confidence-based risk costs, baseline-preserving packing,
+> published controller/scheduler cores and actual SUMO/NR-LDPC software checks.
+> Start with the [method and claim boundaries](docs/CONTRACT_FRAMEWORK.md),
+> [480-CPU HPC runbook](docs/HPC_CONTRACTS.md), and
+> [verification record](docs/CONTRACT_VERIFICATION.md).
+> Uses `BatchContracts` and a separate `.venv-contract`; completed studies below
+> remain intact. New research outcomes and measured-data validation are pending.
+
 > **Full redesign (2026-11-18):** [GapSlice-Cert proofs and assumptions](docs/CERTIFIED_PROOFS.md)
 > and [one-command HPC study](docs/HPC_CERTIFIED.md). This is a separate implementation
 > with backup braking envelopes, stale-information bounds, exact finite-family risk
